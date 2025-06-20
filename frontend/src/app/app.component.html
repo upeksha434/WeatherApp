@@ -1,134 +1,158 @@
-<div class="weather-dashboard">  
-  <aside class="sidebar">
-    <!-- Cube container with logo -->
-    <div class="logo-container">
-      <div class="logo-cube">
-        <img src="assets/wind.png" alt="Weather Logo" class="wind-logo" />
-      </div>
-        <div class="nav-icons">
-        <!-- Weather page icon (current page) -->
-        <div class="nav-item" [class.active]="currentPage === 'weather'" (click)="navigateTo('weather')">
-          <img src="assets/weather-page.png" alt="Weather Page" class="page-icon" />
-        </div>
-        
-        <!-- Settings page icon (dummy) -->
-        <div class="nav-item" [class.active]="currentPage === 'settings'" (click)="navigateTo('settings')">
-          <svg class="page-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-          </svg>
-        </div>
-      </div>
+<!-- Weather Dashboard -->
+<div class="weather-dashboard">
+  <!-- Navigation Sidebar -->
+  <app-navigation 
+    [currentPage]="currentPage" 
+    (pageChange)="onPageChange($event)">
+  </app-navigation>
 
-    </div>
-    
-    <!-- Other sidebar content (e.g., nav icons) -->
-  </aside>
-  <!-- Weather Page Content -->
+  <!-- Main Content Area -->
   <main class="main-content" *ngIf="currentPage === 'weather'">
+    <!-- Search Header -->
     <div class="search-header">
-      <!-- Search input + current city -->
-       <h1>search bar</h1>
-       <h1>current weather</h1>
+      <div class="current-weather" *ngIf="weatherData && !loading">
+        <div class="location">
+          <h2>{{ weatherData.location?.name }}, {{ weatherData.location?.country }}</h2>
+          <p>{{ weatherData.current?.condition?.text }}</p>
+        </div>
+        <div class="temperature">
+          <h1>{{ weatherData.current?.temp_c }}°C</h1>
+          <p>Feels like {{ weatherData.current?.temp_f }}°F</p>
+        </div>
+      </div>
+      
+      <div *ngIf="loading" class="loading">
+        <p>Loading weather data...</p>
+      </div>
+      
+      <div *ngIf="error" class="error">
+        <p>{{ error }}</p>
+        <button (click)="loadWeatherData()">Retry</button>
+      </div>
     </div>
 
+    <!-- Hourly Forecast Section -->
     <section class="hourly-forecast">
-      <!-- Hour-by-hour temperature and icons -->
-       <h1>hourly-forecast</h1>
+      <h3>Hourly Forecast</h3>
+      <!-- Placeholder hourly data -->
+      <div class="hourly-item">
+        <span>12 PM</span>
+        <span>☀️</span>
+        <span>25°</span>
+      </div>
+      <div class="hourly-item">
+        <span>1 PM</span>
+        <span>⛅</span>
+        <span>26°</span>
+      </div>
+      <div class="hourly-item">
+        <span>2 PM</span>
+        <span>☀️</span>
+        <span>27°</span>
+      </div>
+      <div class="hourly-item">
+        <span>3 PM</span>
+        <span>🌤️</span>
+        <span>28°</span>
+      </div>
     </section>
 
-    <section class="air-conditions">
-      <!-- Wind, UV, humidity, etc. -->
-      <h1>air conditions</h1>
+    <!-- Air Conditions Section -->
+    <section class="air-conditions" *ngIf="weatherData">
+      <h3>Air Conditions</h3>
+      <div class="condition-item">
+        <span>💨 Wind</span>
+        <span>{{ weatherData.current?.wind_kph }} km/h</span>
+      </div>
+      <div class="condition-item">
+        <span>💧 Humidity</span>
+        <span>{{ weatherData.current?.humidity }}%</span>
+      </div>
+      <div class="condition-item">
+        <span>☀️ UV Index</span>
+        <span>{{ weatherData.current?.uv }}</span>
+      </div>
     </section>
   </main>
 
-  <aside class="forecast-panel" *ngIf="currentPage === 'weather'">
-    <!-- Loop over daily forecast -->
-     <h1>forecast panel</h1>
-    <div class="forecast-day">
-      <h2>Day 1</h2>
-      <!-- Icon, label, min/max temp -->
-    </div>
-    <div class="forecast-day">
-      <h2>Day 2</h2>
-      <!-- Icon, label, min/max temp -->
-    </div>
-    <div class="forecast-day">
-      <h2>Day 3</h2>
-      <!-- Icon, label, min/max temp -->
-    </div>
-    <div class="forecast-day">
-      <h2>Day 4</h2>
-      <!-- Icon, label, min/max temp -->
-    </div>
-    <div class="forecast-day">
-      <h2>Day 5</h2>
-      <!-- Icon, label, min/max temp -->
-    </div>
-  </aside>
-
-  <!-- Settings Page Content -->
-  <main class="main-content settings-page" *ngIf="currentPage === 'settings'">
+  <!-- Settings Page -->
+  <main class="settings-page" *ngIf="currentPage === 'settings'">
     <div class="settings-header">
       <h1>Settings</h1>
-      <p>Configure your weather app preferences</p>
+      <p>Customize your weather app experience</p>
     </div>
-
-    <section class="settings-section">
-      <h2>Temperature Units</h2>
+    
+    <div class="settings-section">
+      <h2>Temperature Unit</h2>
       <div class="setting-item">
         <label>
-          <input type="radio" name="tempUnit" value="celsius" checked>
+          <input type="radio" name="temperature" value="celsius" checked>
           Celsius (°C)
         </label>
       </div>
       <div class="setting-item">
         <label>
-          <input type="radio" name="tempUnit" value="fahrenheit">
+          <input type="radio" name="temperature" value="fahrenheit">
           Fahrenheit (°F)
         </label>
       </div>
-    </section>
+    </div>
 
-    <section class="settings-section">
-      <h2>Wind Speed Units</h2>
-      <div class="setting-item">
-        <label>
-          <input type="radio" name="windUnit" value="kph" checked>
-          Kilometers per hour (km/h)
-        </label>
-      </div>
-      <div class="setting-item">
-        <label>
-          <input type="radio" name="windUnit" value="mph">
-          Miles per hour (mph)
-        </label>
-      </div>
-    </section>
-
-    <section class="settings-section">
-      <h2>Default Location</h2>
-      <div class="setting-item">
-        <label for="defaultCity">Default City:</label>
-        <input type="text" id="defaultCity" value="Colombo" class="text-input">
-      </div>
-    </section>
-
-    <section class="settings-section">
+    <div class="settings-section">
       <h2>Notifications</h2>
       <div class="setting-item">
         <label>
           <input type="checkbox" checked>
-          Enable weather alerts
+          Weather alerts
         </label>
       </div>
       <div class="setting-item">
         <label>
           <input type="checkbox">
-          Daily forecast notifications
+          Daily forecasts
         </label>
       </div>
-    </section>
+    </div>
   </main>
+
+  <!-- Right Panel - 7 Day Forecast -->
+  <aside class="forecast-panel" *ngIf="currentPage === 'weather'">
+    <h3>7-Day Forecast</h3>
+    <!-- Placeholder forecast data -->
+    <div class="forecast-day">
+      <span>Today</span>
+      <span>☀️</span>
+      <span>25° / 18°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Tomorrow</span>
+      <span>⛅</span>
+      <span>23° / 16°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Wednesday</span>
+      <span>🌧️</span>
+      <span>20° / 14°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Thursday</span>
+      <span>⛈️</span>
+      <span>18° / 12°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Friday</span>
+      <span>🌤️</span>
+      <span>22° / 15°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Saturday</span>
+      <span>☀️</span>
+      <span>26° / 19°</span>
+    </div>
+    <div class="forecast-day">
+      <span>Sunday</span>
+      <span>☀️</span>
+      <span>28° / 21°</span>
+    </div>
+  </aside>
 </div>

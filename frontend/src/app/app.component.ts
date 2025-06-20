@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { NavigationComponent } from './navigation/navigation.component';
 
 interface WeatherData {
   location?: {
@@ -23,7 +24,8 @@ interface WeatherData {
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, NavigationComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -35,6 +37,7 @@ export class AppComponent implements OnInit {
   currentPage = 'weather'; // Track current page for navigation
 
   constructor(private http: HttpClient) {}
+
   ngOnInit() {
     console.log('Component initialized, loading weather data...');
     this.loadWeatherData();
@@ -52,16 +55,18 @@ export class AppComponent implements OnInit {
           console.log('Weather data received:', data);
           this.weatherData = data;
           this.loading = false;
-        },        error: (err) => {
+        },
+        error: (err) => {
           console.error('Weather API error:', err);
-          this.error = 'Failed to load weather data....';
+          this.error = 'Failed to load weather data...';
           this.loading = false;
         }
       });
   }
-  // Navigation method for sidebar
-  navigateTo(page: string) {
-    console.log('Navigating to:', page);
-    this.currentPage = page;    // Add any additional navigation logic here
+
+  // Handle page change from navigation component
+  onPageChange(page: string) {
+    console.log('Page changed to:', page);
+    this.currentPage = page;
   }
 }
