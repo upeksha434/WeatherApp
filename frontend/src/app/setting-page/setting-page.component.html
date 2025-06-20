@@ -1,1 +1,39 @@
-<p>setting-page works!</p>
+<!-- Settings Page -->
+<main class="settings-page">
+  <div class="settings-header">
+    <h1>Settings</h1>
+    <p>Customize your weather app experience</p>
+  </div>
+  
+  <div class="settings-section">
+    <h2>Temperature Unit</h2>
+    <div class="setting-item">
+      <label>
+        <input type="radio" name="temperature" value="celsius" checked>
+        Celsius (°C)
+      </label>
+    </div>
+    <div class="setting-item">
+      <label>
+        <input type="radio" name="temperature" value="fahrenheit">
+        Fahrenheit (°F)
+      </label>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h2>Notifications</h2>
+    <div class="setting-item">
+      <label>
+        <input type="checkbox" checked>
+        Weather alerts
+      </label>
+    </div>
+    <div class="setting-item">
+      <label>
+        <input type="checkbox">
+        Daily forecasts
+      </label>
+    </div>
+  </div>
+</main>

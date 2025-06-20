@@ -1,72 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
-
-interface WeatherData {
-  location?: {
-    name: string;
-    region: string;
-    country: string;
-  };
-  current?: {
-    temp_c: number;
-    temp_f: number;
-    humidity: number;
-    wind_kph: number;
-    uv: number;
-    condition?: {
-      text: string;
-      icon: string;
-    };
-  };
-}
+import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, NavigationComponent],
+  imports: [CommonModule, NavigationComponent, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  title = 'frontend';
-  weatherData: WeatherData | null = null;
-  loading = false;
-  error: string | null = null;
-  currentPage = 'weather'; // Track current page for navigation
-
-  constructor(private http: HttpClient) {}
-
-  ngOnInit() {
-    console.log('Component initialized, loading weather data...');
-    this.loadWeatherData();
-  }
   
-  loadWeatherData() {
-    console.log('Starting to load weather data...');
-    this.loading = true;
-    this.error = null;
-    
-    console.log('Making HTTP request to:', 'http://localhost:8000/api/weather/current/Colombo');
-    this.http.get<WeatherData>('http://localhost:8000/api/weather/current/Colombo')
-      .subscribe({
-        next: (data) => {
-          console.log('Weather data received:', data);
-          this.weatherData = data;
-          this.loading = false;
-        },
-        error: (err) => {
-          console.error('Weather API error:', err);
-          this.error = 'Failed to load weather data...';
-          this.loading = false;
-        }
+  constructor(private router: Router) {}
+  
+  ngOnInit() {
+    // Debug: Listen to route changes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        console.log('Route changed to:', event.url);
       });
-  }
-
-  // Handle page change from navigation component
-  onPageChange(page: string) {
-    console.log('Page changed to:', page);
-    this.currentPage = page;
+    
+    console.log('App component initialized, current route:', this.router.url);
   }
 }

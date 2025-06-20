@@ -1,0 +1,98 @@
+/* Settings page component styles */
+:host {
+  display: contents; /* Makes the component transparent to the parent grid */
+}
+
+/* Settings page styling */
+.settings-page {
+  grid-column: 2 / 4; /* Span across main content and forecast panel areas */
+  background-color: #202b3c;
+  padding: 30px;
+  border-radius: 16px;
+  margin: 20px;
+  overflow-y: auto;
+}
+
+.settings-header {
+  border-bottom: 1px solid #2a3a4d;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.settings-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+}
+
+.settings-header p {
+  color: #a1a8b3;
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #2a3a4d;
+  border-radius: 12px;
+}
+
+.settings-section h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+  color: #ffffff;
+}
+
+.setting-item {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e1e5ea;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.setting-item input[type="radio"],
+.setting-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4a90e2;
+  cursor: pointer;
+}
+
+.setting-item input[type="radio"]:checked,
+.setting-item input[type="checkbox"]:checked {
+  accent-color: #5aa3f0;
+}
+
+.text-input {
+  background-color: #1a2332;
+  border: 1px solid #3b4663;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #ffffff;
+  font-size: 14px;
+  width: 200px;
+  margin-left: 12px;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  background-color: #202b3c;
+}
+
+.text-input::placeholder {
+  color: #a1a8b3;
+}

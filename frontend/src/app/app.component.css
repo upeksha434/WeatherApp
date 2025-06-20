@@ -1,195 +1,25 @@
 .weather-dashboard {
   display: grid;
-  grid-template-columns: 100px 1fr 280px; /* reduced sidebar width */
-  grid-template-rows: auto;
+  grid-template-columns: 100px 1fr 500px; /* reduced sidebar width */
+  grid-template-rows: 100vh;
   height: 100vh;
   background-color: #0b121e;
   color: white;
   font-family: 'Segoe UI', sans-serif;
-}
-
-
-
-/* Right panel for 7-day forecast */
-.forecast-panel {
-  background-color:#202b3c;
-  padding: 20px;
-  border-radius: 16px;
-  display: grid;
-  gap: 20px;
-  padding: 20px;
-  flex-direction: column;
-  border-left: 1px solid #333;
-  margin: 20px;
-  
-}
-/* Hourly forecast */
-.hourly-forecast {
-  background-color: #202b3c;
-  padding: 20px;
-  border-radius: 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: 10px;
-  text-align: center;
-}
-
-/* Center panel (main content) */
-.main-content {
-  padding: 30px;
-  display: grid;
-  grid-template-rows: auto auto auto;
-  gap: 20px;
-}
-
-/* Header / Search bar */
-.search-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Current weather display */
-.current-weather {
-  background-color: #202b3c;
-  padding: 20px;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-
-
-/* Air conditions section */
-.air-conditions {
-  background-color: #202b3c;
-  padding: 20px;
-  border-radius: 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 10px;
-}
-
-
-
-.forecast-day {
-  background-color: #202b3c;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-
-.page-icon{
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    filter: brightness(1.2) grayscale(1);
-    margin-bottom: 10px;
-    color: #6b7280; /* gray color */
-}
-
-/* Navigation items */
-.nav-icons {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;  align-items: center;
-}
-
-/* Settings page styling */
-.settings-page {
-  grid-column: 2 / 4; /* Span across main content and forecast panel areas */
-  background-color: #202b3c;
-  padding: 30px;
-  border-radius: 16px;
-  margin: 20px;
-  overflow-y: auto;
-}
-
-.settings-header {
-  border-bottom: 1px solid #2a3a4d;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
-}
-
-.settings-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #ffffff;
-}
-
-.settings-header p {
-  color: #a1a8b3;
+  gap: 0;
   margin: 0;
-  font-size: 16px;
+  padding: 0;
 }
 
-.settings-section {
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #2a3a4d;
-  border-radius: 12px;
+/* Router outlet styling */
+router-outlet {
+  display: none; /* Hide the router-outlet element itself */
 }
 
-.settings-section h2 {
-  font-size: 20px;
-  font-weight: 500;
-  margin: 0 0 16px 0;
-  color: #ffffff;
-}
-
-.setting-item {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.setting-item label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #e1e5ea;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.setting-item input[type="radio"],
-.setting-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #4a90e2;
-  cursor: pointer;
-}
-
-.setting-item input[type="radio"]:checked,
-.setting-item input[type="checkbox"]:checked {
-  accent-color: #5aa3f0;
-}
-
-.text-input {
-  background-color: #1a2332;
-  border: 1px solid #3b4663;
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: #ffffff;
-  font-size: 14px;
-  width: 200px;
-  margin-left: 12px;
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-  background-color: #202b3c;
-}
-
-.text-input::placeholder {
-  color: #a1a8b3;
+/* Ensure routed components span the remaining grid columns */
+router-outlet + * {
+  grid-column: 2 / 4; /* Span from column 2 to column 4 (main content + forecast panel) */
+  display: contents; /* Make the routed component transparent to the grid */
+  margin: 0;
+  padding: 0;
 }

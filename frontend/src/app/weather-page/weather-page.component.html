@@ -1,1 +1,113 @@
-<p>weather-page works!</p>
+<!-- Main Content Area -->
+<main class="main-content">
+  <!-- Search Header -->
+  <div class="current-weather" *ngIf="weatherData && !loading">
+  <div class="weather-info">
+    <h2>
+  <span style="font-size: 2em;">{{ weatherData.location?.name }}</span>
+  <span style="font-size: 1em; color: gray; margin-left: 8px;">{{ weatherData.location?.country }}</span>
+    </h2>
+
+    <p>{{ weatherData.current?.condition?.text }}</p>
+    <p class="rain-chance">Chance of rain: 0%</p> <!-- Optional -->
+    <h1 class="temperature">{{ weatherData.current?.temp_c }}°C</h1>
+    <!-- <p class="feels-like">Feels like {{ weatherData.current?.temp_f }}°F</p> -->
+  </div>
+
+  <div class="weather-icon">
+    <img [src]="weatherData.current?.condition?.icon" alt="Weather Icon" />
+  </div>
+</div>
+
+  <!-- Hourly Forecast Section -->
+  <section class="hourly-forecast">
+    <h4 class="section-title">HOURLY FORECAST</h4>
+    <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">
+      <div *ngFor="let hour of hourlyForecast" class="hourly-item">
+        <div class="hour-time">{{ hour.time }}</div>
+        <img [src]="hour.condition.icon" [alt]="hour.condition.text" class="hour-icon">
+        <div class="hour-temp">{{ hour.temp_c }}°C</div>
+        <div class="hour-rain">{{ hour.chance_of_rain }}%</div>
+      </div>
+    </div>
+    <div *ngIf="hourlyForecast.length === 0" class="no-hourly-data">
+      <p>Loading hourly forecast...</p>
+    </div>
+  </section>
+
+  <!-- Air Conditions Section -->
+  <section class="air-conditions" *ngIf="weatherData">
+  <h4 class="section-title">AIR CONDITIONS</h4>
+  <div class="condition-grid">
+    <div class="condition-item">
+      <iconify-icon icon="wi:thermometer" class = "icon" width="30" height="30"  style="color: #f8f8f8" alt="Real feel"></iconify-icon>
+      <div>
+        <span class="label">Real Feel</span>
+        <span class="value">{{ weatherData.current?.feelslike_c }}°</span>
+      </div>
+    </div>
+    <div class="condition-item">
+        <iconify-icon icon="tabler:wind" class = "icon" width="30" height="30"  style="color: #f8f8f8" alt="Wind"></iconify-icon>
+      <div>
+        <span class="label">Wind</span>
+        <span class="value">{{ weatherData.current?.wind_kph }} km/h</span>
+      </div>
+    </div>
+    <div class="condition-item"><iconify-icon icon="carbon:humidity" class = "icon" width="32" height="32"  style="color: #f8f8f8"></iconify-icon>
+      <div>
+        <span class="label">Humidity</span>
+        <span class="value">{{ weatherData.current?.humidity }}%</span>
+      </div>
+    </div>
+    <div class="condition-item">
+        <iconify-icon icon="hugeicons:uv-03" class = "icon" width="32" height="32"  style="color: #f8f8f8"></iconify-icon>
+      <div>
+        <span class="label">UV Index</span>
+        <span class="value">{{ weatherData.current?.uv }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Right Panel - 7 Day Forecast -->
+<aside class="forecast-panel">
+  <h3>7-Day Forecast</h3>
+  <!-- Placeholder forecast data -->
+  <div class="forecast-day">
+    <span>Today</span>
+    <span>☀️</span>
+    <span>25° / 18°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Tomorrow</span>
+    <span>⛅</span>
+    <span>23° / 16°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Wednesday</span>
+    <span>🌧️</span>
+    <span>20° / 14°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Thursday</span>
+    <span>⛈️</span>
+    <span>18° / 12°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Friday</span>
+    <span>🌤️</span>
+    <span>22° / 15°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Saturday</span>
+    <span>☀️</span>
+    <span>26° / 19°</span>
+  </div>
+  <div class="forecast-day">
+    <span>Sunday</span>
+    <span>☀️</span>
+    <span>28° / 21°</span>
+  </div>
+</aside>
