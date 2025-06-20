@@ -1,0 +1,77 @@
+/* Sidebar */
+.sidebar {
+  background-color: #202b3c;
+  border-radius: 16px;
+  display: grid;
+  margin: 20px;
+  text-align: center;
+  gap: 20px;
+  width: 90px;
+  padding-top: 20px;
+  height: calc(100vh - 40px); /* Subtract top and bottom margins */
+  box-sizing: border-box;
+}
+
+.logo-container {
+  display: grid;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Cube-like square container */
+.logo-cube {
+  width: 60px;
+  height: 60px;
+  background-color: #2a3a4d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.wind-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: brightness(1.2);
+}
+
+.page-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: brightness(0.7) grayscale(1);
+  transition: all 0.3s ease;
+}
+
+.nav-icons {
+  display: grid;
+  gap: 10px;
+  justify-content: center;
+}
+
+.nav-item {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: transparent;
+}
+
+.nav-item:hover {
+  background-color: #2a3a4d;
+}
+
+.nav-item.active {
+  background-color: #3b4663;
+}
+
+.nav-item.active .page-icon {
+  filter: brightness(1.2) grayscale(0);
+  color: white;
+}

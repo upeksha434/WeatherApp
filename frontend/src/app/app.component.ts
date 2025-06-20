@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
   weatherData: WeatherData | null = null;
   loading = false;
   error: string | null = null;
+  currentPage = 'weather'; // Track current page for navigation
 
   constructor(private http: HttpClient) {}
   ngOnInit() {
@@ -51,12 +52,16 @@ export class AppComponent implements OnInit {
           console.log('Weather data received:', data);
           this.weatherData = data;
           this.loading = false;
-        },
-        error: (err) => {
+        },        error: (err) => {
           console.error('Weather API error:', err);
           this.error = 'Failed to load weather data....';
           this.loading = false;
         }
       });
+  }
+  // Navigation method for sidebar
+  navigateTo(page: string) {
+    console.log('Navigating to:', page);
+    this.currentPage = page;    // Add any additional navigation logic here
   }
 }
