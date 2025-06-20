@@ -7,11 +7,14 @@ router = APIRouter()
 
 
 @router.get("/current/{location}", response_model=CurrentWeatherResponse)
+
 async def get_current_weather(
+    
     location: str,
     aqi: bool = Query(True, description="Include air quality data")
 ):
     """Get current weather for a specific location"""
+    print(f"[REQUEST RECEIVED] Location: {location}, AQI: {aqi}")
     try:
         return await weather_service.get_current_weather(location, aqi)
     except ValueError as e:

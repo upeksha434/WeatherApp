@@ -11,12 +11,13 @@ class Settings(BaseSettings):
     app_name: str = "Weather App API"
     app_version: str = "1.0.0"
     debug: bool = True
-    
-    # CORS Settings
+      # CORS Settings
     cors_origins: List[str] = [
         "http://localhost:3000",
+        "http://localhost:4200",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:4200",
         "http://127.0.0.1:5173"
     ]
     

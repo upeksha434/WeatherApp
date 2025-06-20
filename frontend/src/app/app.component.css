@@ -1,0 +1,95 @@
+.weather-dashboard {
+  display: grid;
+  grid-template-columns: 100px 1fr 280px; /* reduced sidebar width */
+  grid-template-rows: auto;
+  height: 100vh;
+  background-color: #0b121e;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+
+/* Sidebar */
+.sidebar {
+  background-color: #202b3c;
+  border-radius: 16px;
+  display: grid;
+  margin: 20px;
+  text-align: center;
+  gap: 20px;
+  padding: 20px;       /* use padding instead of margin */      
+  width: 80px;
+}
+
+/* Right panel for 7-day forecast */
+.forecast-panel {
+  background-color:#202b3c;
+  padding: 20px;
+  border-radius: 16px;
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  flex-direction: column;
+  border-left: 1px solid #333;
+  margin: 20px;
+  
+}
+/* Hourly forecast */
+.hourly-forecast {
+  background-color: #202b3c;
+  padding: 20px;
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 10px;
+  text-align: center;
+}
+
+/* Center panel (main content) */
+.main-content {
+  padding: 30px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 20px;
+}
+
+/* Header / Search bar */
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Current weather display */
+.current-weather {
+  background-color: #202b3c;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+
+/* Air conditions section */
+.air-conditions {
+  background-color: #202b3c;
+  padding: 20px;
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+
+
+.forecast-day {
+  background-color: #202b3c;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
