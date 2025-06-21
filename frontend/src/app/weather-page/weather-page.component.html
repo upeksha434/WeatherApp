@@ -1,29 +1,48 @@
 <!-- Main Content Area -->
-<main class="main-content">
-  <!-- Search Header -->
+<main class="main-content">  <!-- Current Weather Section with Search -->
   <div class="current-weather" *ngIf="weatherData && !loading">
-  <div class="weather-info">
-    <h2>
-  <span style="font-size: 2em;">{{ weatherData.location?.name }}</span>
-  <span style="font-size: 1em; color: gray; margin-left: 8px;">{{ weatherData.location?.country }}</span>
-    </h2>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-bar">
+        <iconify-icon icon="material-symbols:search" class="search-icon" width="20" height="20"></iconify-icon>
+        <input 
+          type="text" 
+          placeholder="Search for a city..." 
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="searchWeather()"
+          #searchInput>        <button class="search-button" (click)="searchWeather()" [disabled]="!searchQuery.trim()">
+          Search
+        </button>
+      </div>
+    </div>
 
-    <p>{{ weatherData.current?.condition?.text }}</p>
-    <p class="rain-chance">Chance of rain: 0%</p> <!-- Optional -->
-    <h1 class="temperature">{{ weatherData.current?.temp_c }}°C</h1>
-    <!-- <p class="feels-like">Feels like {{ weatherData.current?.temp_f }}°F</p> -->
+    <!-- Weather Info -->
+    <div class="weather-content">
+      <div class="weather-info">
+        <h2>
+          <span style="font-size: 2em;">{{ weatherData.location?.name }}</span>
+          <span style="font-size: 1em; color: gray; margin-left: 8px;">{{ weatherData.location?.country }}</span>
+        </h2>
+
+        <p>{{ weatherData.current?.condition?.text }}</p>
+        <p class="rain-chance">Chance of rain: 0%</p> <!-- Optional -->
+        <h1 class="temperature">{{ weatherData.current?.temp_c }}°C</h1>
+        <!-- <p class="feels-like">Feels like {{ weatherData.current?.temp_f }}°F</p> -->
+      </div>
+
+      <div class="weather-icon">
+        <img [src]="weatherData.current?.condition?.icon" alt="Weather Icon" />
+      </div>
+    </div>
   </div>
-
-  <div class="weather-icon">
-    <img [src]="weatherData.current?.condition?.icon" alt="Weather Icon" />
-  </div>
-</div>
-
   <!-- Hourly Forecast Section -->
   <section class="hourly-forecast">
     <h4 class="section-title">HOURLY FORECAST</h4>
     <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">
-      <div *ngFor="let hour of hourlyForecast" class="hourly-item">
+      <div *ngFor="let hour of hourlyForecast" 
+           class="hourly-item"
+           [class.current-hour]="isCurrentHour(hour.time)">
         <div class="hour-time">{{ hour.time }}</div>
         <img [src]="hour.condition.icon" [alt]="hour.condition.text" class="hour-icon">
         <div class="hour-temp">{{ hour.temp_c }}°C</div>
@@ -73,41 +92,26 @@
 
 <!-- Right Panel - 7 Day Forecast -->
 <aside class="forecast-panel">
-  <h3>7-Day Forecast</h3>
-  <!-- Placeholder forecast data -->
-  <div class="forecast-day">
-    <span>Today</span>
-    <span>☀️</span>
-    <span>25° / 18°</span>
+  <h4 class="section-title">7-DAY FORECAST</h4>
+  <div class="forecast-panel-sub" *ngIf="weeklyForecast.length > 0; else loadingForecast">
+    <div *ngFor="let day of weeklyForecast; let i = index" class="forecast-row">
+      <span class="day-name">{{ getDayName(day.date, i) }}</span>
+
+      <div class="icon-and-condition">
+        <img [src]="day.day.condition.icon" [alt]="day.day.condition.text" class="forecast-icon" />
+        <span class="condition">{{ day.day.condition.text }}</span>
+      </div>
+
+      <div class="temps">
+        <span class="max-temp">{{ day.day.maxtemp_c }}°</span>
+        <span class="slash">/</span>
+        <span class="min-temp">{{ day.day.mintemp_c }}°</span>
+      </div>
+    </div>
   </div>
-  <div class="forecast-day">
-    <span>Tomorrow</span>
-    <span>⛅</span>
-    <span>23° / 16°</span>
-  </div>
-  <div class="forecast-day">
-    <span>Wednesday</span>
-    <span>🌧️</span>
-    <span>20° / 14°</span>
-  </div>
-  <div class="forecast-day">
-    <span>Thursday</span>
-    <span>⛈️</span>
-    <span>18° / 12°</span>
-  </div>
-  <div class="forecast-day">
-    <span>Friday</span>
-    <span>🌤️</span>
-    <span>22° / 15°</span>
-  </div>
-  <div class="forecast-day">
-    <span>Saturday</span>
-    <span>☀️</span>
-    <span>26° / 19°</span>
-  </div>
-  <div class="forecast-day">
-    <span>Sunday</span>
-    <span>☀️</span>
-    <span>28° / 21°</span>
-  </div>
+
+  <ng-template #loadingForecast>
+    <div class="forecast-row">Loading forecast...</div>
+  </ng-template>
 </aside>
+

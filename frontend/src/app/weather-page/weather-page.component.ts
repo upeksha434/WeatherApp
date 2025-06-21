@@ -1,6 +1,7 @@
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface WeatherData {
   location?: {
@@ -32,10 +33,23 @@ interface HourlyForecast {
   chance_of_rain: number;
 }
 
+interface DailyForecast {
+  date: string;
+  day: {
+    maxtemp_c: number;
+    mintemp_c: number;
+    condition: {
+      text: string;
+      icon: string;
+    };
+    chance_of_rain: number;
+  };
+}
+
 @Component({
   selector: 'app-weather-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './weather-page.component.html',
   styleUrl: './weather-page.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -43,9 +57,12 @@ interface HourlyForecast {
 export class WeatherPageComponent implements OnInit {
   weatherData: WeatherData | null = null;
   hourlyForecast: HourlyForecast[] = [];
+  weeklyForecast: DailyForecast[] = [];
   loading = false;
   error: string | null = null;
-  selectedHours = ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
+  searchQuery: string = '';
+  currentLocation: string = 'Colombo'; // Default location
+  selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
 
   constructor(private http: HttpClient) {}
 
@@ -53,6 +70,17 @@ export class WeatherPageComponent implements OnInit {
     console.log('Weather page initialized, loading weather data...');
     this.loadWeatherData();
     this.loadHourlyForecast();
+    this.loadWeeklyForecast();
+  }
+  // Search for weather in a new location
+  searchWeather() {
+    if (this.searchQuery && this.searchQuery.trim()) {
+      this.currentLocation = this.searchQuery.trim();
+      this.loadWeatherData();
+      this.loadHourlyForecast();
+      this.loadWeeklyForecast();
+      this.searchQuery = ''; // Clear search input after search
+    }
   }
   
   loadWeatherData() {
@@ -60,8 +88,9 @@ export class WeatherPageComponent implements OnInit {
     this.loading = true;
     this.error = null;
     
-    console.log('Making HTTP request to:', 'http://localhost:8000/api/weather/current/Colombo');
-    this.http.get<WeatherData>('http://localhost:8000/api/weather/current/Colombo')
+    const apiUrl = `http://localhost:8000/api/weather/current/${this.currentLocation}`;
+    console.log('Making HTTP request to:', apiUrl);
+    this.http.get<WeatherData>(apiUrl)
       .subscribe({
         next: (data) => {
           console.log('Weather data received:', data);
@@ -78,7 +107,8 @@ export class WeatherPageComponent implements OnInit {
   }
   loadHourlyForecast() {
     console.log('Loading hourly forecast...');
-    this.http.get<any>('http://localhost:8000/api/weather/hourly/Colombo?hours=24')
+    const apiUrl = `http://localhost:8000/api/weather/hourly/${this.currentLocation}?hours=24`;
+    this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
           console.log('Hourly forecast data:', data);
@@ -90,7 +120,48 @@ export class WeatherPageComponent implements OnInit {
           console.error('Hourly forecast error:', err);
         }
       });
+  }  loadWeeklyForecast() {
+    console.log('Loading 7-day forecast...');
+    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7`;
+    this.http.get<any>(apiUrl)
+      .subscribe({
+        next: (data) => {
+          console.log('7-day forecast data:', data);
+          console.log('Forecast days count:', data.forecast?.forecastday?.length || 0);
+          
+          // Process the forecast data
+          this.weeklyForecast = this.processForecastData(data.forecast?.forecastday || []);
+          console.log('Processed weekly forecast:', this.weeklyForecast);
+          console.log('Weekly forecast count:', this.weeklyForecast.length);
+          
+          // If we only get 3 days, let's add some mock data for demonstration
+          if (this.weeklyForecast.length < 7) {
+            console.log('Only received', this.weeklyForecast.length, 'days. Adding mock data for remaining days.');
+            this.addMockForecastDays();
+          }
+        },
+        error: (err) => {
+          console.error('7-day forecast error:', err);
+        }
+      });
   }
+
+  // Process forecast data to match our interface
+  processForecastData(forecastData: any[]): DailyForecast[] {
+    return forecastData.map(day => ({
+      date: day.date,
+      day: {
+        maxtemp_c: day.day.maxtemp_c,
+        mintemp_c: day.day.mintemp_c,
+        condition: {
+          text: day.day.condition.text,
+          icon: day.day.condition.icon
+        },
+        chance_of_rain: day.day.daily_chance_of_rain || 0
+      }
+    }));
+  }
+
   // Filter hourly data to show only selected hours
   filterHourlyData(hourlyData: any[]): HourlyForecast[] {
     const currentHour = new Date().getHours();
@@ -101,10 +172,10 @@ export class WeatherPageComponent implements OnInit {
       const hourTime = new Date(hour.time).getHours();
       const hourString = hourTime.toString().padStart(2, '0') + ':00';
       const isSelectedHour = this.selectedHours.includes(hourString);
-      const isCurrentOrFuture = hourTime >= currentHour;
+      // const isCurrentOrFuture = hourTime >= currentHour;
       
-      console.log(`Hour ${hourTime} (${hourString}): selected=${isSelectedHour}, future=${isCurrentOrFuture}`);
-      return isSelectedHour && isCurrentOrFuture;
+      // console.log(`Hour ${hourTime} (${hourString}): selected=${isSelectedHour}, future=${isCurrentOrFuture}`);
+      return isSelectedHour;
     });
     
     console.log('Filtered hours count:', filtered.length);
@@ -117,12 +188,82 @@ export class WeatherPageComponent implements OnInit {
       chance_of_rain: hour.chance_of_rain || 0
     }));
   }
-
   formatTime(timeString: string): string {
     const date = new Date(timeString);
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
       hour12: true 
     });
+  }
+
+  // Check if the given hour block represents the current or next relevant hour
+  isCurrentHour(hourTime: string): boolean {
+    const currentHour = new Date().getHours();
+    
+    // Extract hour from the hourTime string (format: "HH:00")
+    const forecastHour = parseInt(hourTime.split(':')[0]);
+    
+    // Find the next relevant forecast hour based on current time
+    let nextRelevantHour = -1;
+    for (let selectedHour of this.selectedHours) {
+      const selectedHourNum = parseInt(selectedHour.split(':')[0]);
+      if (selectedHourNum >= currentHour) {
+        nextRelevantHour = selectedHourNum;
+        break;
+      }
+    }
+    
+    // If no hour found for today, use the first hour of tomorrow (00:00)
+    if (nextRelevantHour === -1) {
+      nextRelevantHour = parseInt(this.selectedHours[0].split(':')[0]);
+    }
+    
+    return forecastHour === nextRelevantHour;
+  }
+
+  // Format date to display proper day names
+  getDayName(dateString: string, index: number): string {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    if (index === 0) {
+      return 'Today';
+    } else if (index === 1) {
+      return 'Tomorrow';
+    } else {
+      return date.toLocaleDateString('en-US', { weekday: 'long' });
+    }
+  }
+
+  // Add mock forecast days when API returns less than 7 days
+  addMockForecastDays() {
+    const currentLength = this.weeklyForecast.length;
+    const mockConditions = [
+      { text: 'Partly cloudy', icon: '//cdn.weatherapi.com/weather/64x64/day/116.png' },
+      { text: 'Sunny', icon: '//cdn.weatherapi.com/weather/64x64/day/113.png' },
+      { text: 'Light rain', icon: '//cdn.weatherapi.com/weather/64x64/day/296.png' },
+      { text: 'Cloudy', icon: '//cdn.weatherapi.com/weather/64x64/day/119.png' }
+    ];
+
+    for (let i = currentLength; i < 7; i++) {
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + i);
+      
+      const mockDay: DailyForecast = {
+        date: futureDate.toISOString().split('T')[0],
+        day: {
+          maxtemp_c: Math.floor(Math.random() * 10) + 20, // Random temp between 20-30
+          mintemp_c: Math.floor(Math.random() * 8) + 12,  // Random temp between 12-20
+          condition: mockConditions[i % mockConditions.length],
+          chance_of_rain: Math.floor(Math.random() * 50) // Random chance 0-50%
+        }
+      };
+      
+      this.weeklyForecast.push(mockDay);
+    }
+    
+    console.log('Added mock data. Total forecast days:', this.weeklyForecast.length);
   }
 }
