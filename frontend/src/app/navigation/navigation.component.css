@@ -1,6 +1,6 @@
 /* Sidebar */
 .sidebar {
-  background-color: #202b3c;
+  background-color: var(--bg-secondary);
   border-radius: 16px;
   display: grid;
   margin: 20px;
@@ -22,7 +22,7 @@
 .logo-cube {
   width: 60px;
   height: 60px;
-  background-color: #2a3a4d;
+  background-color: var(--bg-tertiary);
   display: flex;
   justify-content: center;
   align-items: center;

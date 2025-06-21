@@ -2,6 +2,7 @@ import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SettingsService } from '../services/settings.service';
 
 interface WeatherData {
   location?: {
@@ -59,14 +60,30 @@ export class WeatherPageComponent implements OnInit {
   hourlyForecast: HourlyForecast[] = [];
   weeklyForecast: DailyForecast[] = [];
   loading = false;
-  error: string | null = null;
-  searchQuery: string = '';
+  error: string | null = null;  searchQuery: string = '';
   currentLocation: string = 'Colombo'; // Default location
   selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
+  currentSettings: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    public settingsService: SettingsService
+  ) {
+    this.currentSettings = this.settingsService.getSettings();
+  }
 
   ngOnInit() {
+    // Subscribe to settings changes
+    this.settingsService.settings$.subscribe(settings => {
+      this.currentSettings = settings;
+      console.log('Weather page: Settings updated:', settings);
+    });
+
+    // Load weather data for the saved default location
+    const defaultLocation = this.currentSettings.defaultLocation || 'Colombo';
+    this.currentLocation = defaultLocation;
+    console.log('Loading weather for default location:', defaultLocation);
+    
     console.log('Weather page initialized, loading weather data...');
     this.loadWeatherData();
     this.loadHourlyForecast();

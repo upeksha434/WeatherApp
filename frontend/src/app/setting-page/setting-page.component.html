@@ -4,20 +4,75 @@
     <h1>Settings</h1>
     <p>Customize your weather app experience</p>
   </div>
-  
-  <div class="settings-section">
-    <h2>Temperature Unit</h2>
+    <div class="settings-section">
+    <h2>Theme</h2>    <div class="setting-item">
+      <label>
+        <input 
+          type="radio" 
+          name="theme" 
+          value="dark" 
+          [checked]="settings.theme === 'dark'"
+          (change)="onThemeChange($event)">
+        Dark Mode
+      </label>
+    </div>
     <div class="setting-item">
       <label>
-        <input type="radio" name="temperature" value="celsius" checked>
+        <input 
+          type="radio" 
+          name="theme" 
+          value="light" 
+          [checked]="settings.theme === 'light'"
+          (change)="onThemeChange($event)">
+        Light Mode
+      </label>
+    </div>
+  </div>
+  <div class="settings-section">
+    <h2>Temperature Unit</h2>    <div class="setting-item">
+      <label>
+        <input 
+          type="radio" 
+          name="temperature" 
+          value="celsius" 
+          [checked]="settings.temperatureUnit === 'celsius'"
+          (change)="onTemperatureUnitChange($event)">
         Celsius (°C)
       </label>
     </div>
     <div class="setting-item">
       <label>
-        <input type="radio" name="temperature" value="fahrenheit">
+        <input 
+          type="radio" 
+          name="temperature" 
+          value="fahrenheit"
+          [checked]="settings.temperatureUnit === 'fahrenheit'"
+          (change)="onTemperatureUnitChange($event)">
         Fahrenheit (°F)
       </label>
+    </div>  </div>
+
+  <div class="settings-section">
+    <h2>Default Location</h2>
+    <div class="setting-item">
+      <label>
+        City:
+        <input 
+          type="text" 
+          [value]="settings.defaultLocation" 
+          (blur)="onLocationChange($event)"
+          (keyup.enter)="onLocationChange($event)"
+          placeholder="Enter default city">
+      </label>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h2>Actions</h2>
+    <div class="setting-item">
+      <button (click)="resetToDefaults()" class="reset-button">
+        Reset to Defaults
+      </button>
     </div>
   </div>
 

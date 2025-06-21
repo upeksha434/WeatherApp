@@ -23,11 +23,9 @@
         <h2>
           <span style="font-size: 2em;">{{ weatherData.location?.name }}</span>
           <span style="font-size: 1em; color: gray; margin-left: 8px;">{{ weatherData.location?.country }}</span>
-        </h2>
-
-        <p>{{ weatherData.current?.condition?.text }}</p>
+        </h2>        <p>{{ weatherData.current?.condition?.text }}</p>
         <p class="rain-chance">Chance of rain: 0%</p> <!-- Optional -->
-        <h1 class="temperature">{{ weatherData.current?.temp_c }}°C</h1>
+        <h1 class="temperature">{{ settingsService.formatTemperature(weatherData.current?.temp_c || 0) }}</h1>
         <!-- <p class="feels-like">Feels like {{ weatherData.current?.temp_f }}°F</p> -->
       </div>
 
@@ -42,10 +40,9 @@
     <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">
       <div *ngFor="let hour of hourlyForecast" 
            class="hourly-item"
-           [class.current-hour]="isCurrentHour(hour.time)">
-        <div class="hour-time">{{ hour.time }}</div>
+           [class.current-hour]="isCurrentHour(hour.time)">        <div class="hour-time">{{ hour.time }}</div>
         <img [src]="hour.condition.icon" [alt]="hour.condition.text" class="hour-icon">
-        <div class="hour-temp">{{ hour.temp_c }}°C</div>
+        <div class="hour-temp">{{ settingsService.formatTemperature(hour.temp_c) }}</div>
         <div class="hour-rain">{{ hour.chance_of_rain }}%</div>
       </div>
     </div>
@@ -59,10 +56,9 @@
   <h4 class="section-title">AIR CONDITIONS</h4>
   <div class="condition-grid">
     <div class="condition-item">
-      <iconify-icon icon="wi:thermometer" class = "icon" width="30" height="30"  style="color: #f8f8f8" alt="Real feel"></iconify-icon>
-      <div>
+      <iconify-icon icon="wi:thermometer" class = "icon" width="30" height="30"  style="color: #f8f8f8" alt="Real feel"></iconify-icon>      <div>
         <span class="label">Real Feel</span>
-        <span class="value">{{ weatherData.current?.feelslike_c }}°</span>
+        <span class="value">{{ settingsService.formatTemperature(weatherData.current?.feelslike_c || 0) }}</span>
       </div>
     </div>
     <div class="condition-item">
@@ -100,12 +96,9 @@
       <div class="icon-and-condition">
         <img [src]="day.day.condition.icon" [alt]="day.day.condition.text" class="forecast-icon" />
         <span class="condition">{{ day.day.condition.text }}</span>
-      </div>
-
-      <div class="temps">
-        <span class="max-temp">{{ day.day.maxtemp_c }}°</span>
+      </div>      <div class="temps">        <span class="max-temp">{{ settingsService.convertTemperature(day.day.maxtemp_c).value }}°</span>
         <span class="slash">/</span>
-        <span class="min-temp">{{ day.day.mintemp_c }}°</span>
+        <span class="min-temp">{{ settingsService.convertTemperature(day.day.mintemp_c).value }}°</span>
       </div>
     </div>
   </div>

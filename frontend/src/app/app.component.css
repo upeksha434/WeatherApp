@@ -3,14 +3,15 @@
   grid-template-columns: 100px 1fr 500px; /* reduced sidebar width */
   grid-template-rows: auto;
   height: 100vh;
-  background-color: #0b121e;
-  color: white;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: 'Segoe UI', sans-serif;
   gap: 0;
   margin: 0;
   padding: 0;
   width: 100vw; 
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Router outlet styling */

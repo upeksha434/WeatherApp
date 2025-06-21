@@ -3,6 +3,7 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { SettingsService } from './services/settings.service';
 
 @Component({
   selector: 'app-root',
@@ -13,9 +14,15 @@ import { filter } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
   
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private settingsService: SettingsService
+  ) {}
   
   ngOnInit() {
+    // Settings service will automatically apply the saved theme on initialization
+    console.log('App initialized with settings:', this.settingsService.getSettings());
+    
     // Debug: Listen to route changes
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
