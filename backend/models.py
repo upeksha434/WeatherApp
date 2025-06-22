@@ -139,10 +139,31 @@ class Forecast(BaseModel):
     forecastday: List[ForecastDay]
 
 
+class WeatherAlert(BaseModel):
+    headline: str
+    msgtype: str
+    severity: str
+    urgency: str
+    areas: str
+    category: str
+    certainty: str
+    event: str
+    note: str
+    effective: str
+    expires: str
+    desc: str
+    instruction: str
+
+
+class Alerts(BaseModel):
+    alert: List[WeatherAlert]
+
+
 class ForecastResponse(BaseModel):
     location: Location
     current: Current
     forecast: Forecast
+    alerts: Optional[Alerts] = None
 
 
 class SearchLocation(BaseModel):

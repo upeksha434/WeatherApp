@@ -96,9 +96,13 @@
       <div class="icon-and-condition">
         <img [src]="day.day.condition.icon" [alt]="day.day.condition.text" class="forecast-icon" />
         <span class="condition">{{ day.day.condition.text }}</span>
-      </div>      <div class="temps">        <span class="max-temp">{{ settingsService.convertTemperature(day.day.maxtemp_c).value }}°</span>
+      </div>      <div class="temps">        <span class="max-temp" 
+              title="Maximum temperature"
+              >{{ settingsService.convertTemperature(day.day.maxtemp_c).value }}°</span>
         <span class="slash">/</span>
-        <span class="min-temp">{{ settingsService.convertTemperature(day.day.mintemp_c).value }}°</span>
+        <span class="min-temp" 
+              title="Minimum temperature"
+              >{{ settingsService.convertTemperature(day.day.mintemp_c).value }}°</span>
       </div>
     </div>
   </div>
@@ -117,6 +121,64 @@
       <h3>{{ selectedHourlyData.time }} Forecast</h3>
       <button class="close-button" (click)="closeHourlyPopup()">
         <iconify-icon icon="material-symbols:close" width="24" height="24"></iconify-icon>
+      </button>
+    </div>
+      <!-- Navigation Tiles Section with Arrows -->
+    <div class="popup-navigation-section">
+      <!-- Left Arrow -->
+      <button class="nav-arrow nav-arrow-left" 
+              [disabled]="selectedHourIndex === 0"
+              (click)="navigateToPrevious()">
+        <iconify-icon icon="material-symbols:chevron-left" width="24" height="24"></iconify-icon>
+      </button>
+      
+      <!-- Navigation Tiles -->
+      <div class="popup-navigation-tiles">
+        <!-- Previous Tile -->
+        <div class="nav-tile nav-tile-blur" 
+             *ngIf="navigationHourlyData.previous"
+             (click)="navigateToPrevious()">
+          <div class="nav-tile-time">{{ navigationHourlyData.previous.time }}</div>
+          <img [src]="navigationHourlyData.previous.condition.icon" 
+               [alt]="navigationHourlyData.previous.condition.text" 
+               class="nav-tile-icon">
+          <div class="nav-tile-temp">{{ settingsService.formatTemperature(navigationHourlyData.previous.temp_c) }}</div>
+        </div>
+          <!-- Current Tile -->
+        <div class="nav-tile nav-tile-current" *ngIf="navigationHourlyData.current">
+          <div class="nav-tile-time">{{ navigationHourlyData.current.time }}</div>
+          <img [src]="navigationHourlyData.current.condition.icon" 
+               [alt]="navigationHourlyData.current.condition.text" 
+               class="nav-tile-icon">
+          <div class="nav-tile-temp">{{ settingsService.formatTemperature(navigationHourlyData.current.temp_c) }}</div>
+        </div>
+        
+        <!-- Next Tile -->
+        <div class="nav-tile nav-tile-blur" 
+             *ngIf="navigationHourlyData.next"
+             (click)="navigateToNext()">
+          <div class="nav-tile-time">{{ navigationHourlyData.next.time }}</div>
+          <img [src]="navigationHourlyData.next.condition.icon" 
+               [alt]="navigationHourlyData.next.condition.text" 
+               class="nav-tile-icon">
+          <div class="nav-tile-temp">{{ settingsService.formatTemperature(navigationHourlyData.next.temp_c) }}</div>
+        </div>
+      </div>
+      
+      <!-- Right Arrow -->
+      <button class="nav-arrow nav-arrow-right" 
+              [disabled]="selectedHourIndex === hourlyForecast.length - 1"
+              (click)="navigateToNext()">
+        <iconify-icon icon="material-symbols:chevron-right" width="24" height="24"></iconify-icon>
+      </button>
+    </div>
+    
+    <!-- Dots Navigation -->
+    <div class="popup-dots-navigation">
+      <button *ngFor="let hour of hourlyForecast; let i = index"
+              class="nav-dot"
+              [class.nav-dot-active]="i === selectedHourIndex"
+              (click)="navigateToIndex(i)">
       </button>
     </div>
     

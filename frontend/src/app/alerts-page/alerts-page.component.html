@@ -1,0 +1,105 @@
+<div class="alerts-container">
+  <div class="alerts-header">
+    <h1>Weather Alerts - {{ currentLocation }}</h1>
+    <div class="alerts-actions">
+      <button class="action-btn" (click)="loadAlerts()" [disabled]="isLoading">
+        <iconify-icon icon="material-symbols:refresh" [class.spinning]="isLoading"></iconify-icon>
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+      <button class="action-btn" (click)="markAllAsRead()" *ngIf="unreadCount > 0 && !isLoading">
+        <iconify-icon icon="material-symbols:mark-email-read"></iconify-icon>
+        Mark All Read
+      </button>
+      <button class="action-btn danger" (click)="clearAllAlerts()" *ngIf="alerts.length > 0 && !isLoading">
+        <iconify-icon icon="material-symbols:delete"></iconify-icon>
+        Clear All
+      </button>
+    </div>
+  </div>
+  <div class="alerts-summary" *ngIf="!isLoading && alerts.length > 0">
+    <div class="summary-item">
+      <iconify-icon icon="material-symbols:notifications"></iconify-icon>
+      <span>{{ alerts.length }} Total Alerts</span>
+    </div>
+    <div class="summary-item" *ngIf="unreadCount > 0">
+      <iconify-icon icon="material-symbols:mark-email-unread"></iconify-icon>
+      <span>{{ unreadCount }} Unread</span>
+    </div>
+  </div><!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <iconify-icon icon="material-symbols:refresh" class="spinning"></iconify-icon>
+    <p>Loading weather alerts for {{ currentLocation }}...</p>
+  </div>
+
+  <div class="alerts-list" *ngIf="!isLoading && alerts.length > 0; else noAlertsTemplate">
+    <div 
+      class="alert-item" 
+      *ngFor="let alert of alerts"
+      [class.unread]="!alert.isRead"
+      [class.severity-high]="alert.severity === 'high'"
+      [class.severity-medium]="alert.severity === 'medium'"
+      [class.severity-low]="alert.severity === 'low'"
+    >
+      <div class="alert-icon">
+        <iconify-icon [icon]="getSeverityIcon(alert.severity)"></iconify-icon>
+      </div>
+      
+      <div class="alert-content">
+        <div class="alert-header">
+          <h3 class="alert-title">{{ alert.title }}</h3>
+          <div class="alert-meta">
+            <span class="alert-time">{{ formatTime(alert.timestamp) }}</span>
+            <span class="alert-severity" [class]="'severity-' + alert.severity">
+              {{ alert.severity | titlecase }}
+            </span>
+          </div>
+        </div>
+        
+        <p class="alert-description">{{ alert.description }}</p>
+        
+        <!-- Show additional alert info if available -->
+        <div class="alert-details" *ngIf="alert.event || alert.areas || alert.expires">
+          <div class="alert-detail" *ngIf="alert.event">
+            <strong>Event:</strong> {{ alert.event }}
+          </div>
+          <div class="alert-detail" *ngIf="alert.areas">
+            <strong>Areas:</strong> {{ alert.areas }}
+          </div>          <div class="alert-detail" *ngIf="alert.expires">
+            <strong>Expires:</strong> {{ alert.expires }}
+          </div>
+        </div>
+        
+        <div class="alert-actions">
+          <button 
+            class="alert-action-btn" 
+            (click)="markAsRead(alert.id)"
+            *ngIf="!alert.isRead"
+            title="Mark as read"
+          >
+            <iconify-icon icon="material-symbols:check"></iconify-icon>
+          </button>
+          <button 
+            class="alert-action-btn delete" 
+            (click)="deleteAlert(alert.id)"
+            title="Delete alert"
+          >
+            <iconify-icon icon="material-symbols:delete"></iconify-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noAlertsTemplate>
+    <div class="no-alerts" *ngIf="!isLoading">
+      <iconify-icon icon="material-symbols:notifications-off"></iconify-icon>
+      <h2>No Weather Alerts</h2>
+      <p>There are currently no active weather alerts for <strong>{{ currentLocation }}</strong>.</p>
+      <p>We'll keep monitoring and notify you of any weather warnings or advisories in your area.</p>
+      <button class="refresh-btn" (click)="loadAlerts()">
+        <iconify-icon icon="material-symbols:refresh"></iconify-icon>
+        Check Again
+      </button>
+    </div>
+  </ng-template>
+</div>

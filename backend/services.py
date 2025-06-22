@@ -81,6 +81,49 @@ class WeatherService:
         
         data = await self._make_request("current.json", params)
         return data.get("current", {}).get("air_quality", {})
+    
+    async def get_alerts(self, location: str) -> dict:
+        """Get weather alerts for a location"""
+        params = {
+            "q": location,
+            "alerts": "yes"
+        }
+        
+        # Use forecast endpoint with alerts to get alert data
+        data = await self._make_request("forecast.json", params)
+        
+        # Extract alerts from the response
+        alerts = data.get("alerts", {"alert": []})
+        
+        # Transform alerts data for frontend consumption
+        transformed_alerts = []
+        for alert in alerts.get("alert", []):
+            transformed_alerts.append({
+                "id": str(hash(alert.get("headline", "") + alert.get("effective", ""))),
+                "title": alert.get("headline", "Weather Alert"),
+                "description": alert.get("desc", ""),
+                "severity": self._map_severity(alert.get("severity", "")),
+                "timestamp": alert.get("effective", ""),
+                "expires": alert.get("expires", ""),
+                "event": alert.get("event", ""),
+                "areas": alert.get("areas", ""),
+                "isRead": False
+            })
+        
+        return {
+            "location": data.get("location", {}),
+            "alerts": transformed_alerts
+        }
+    
+    def _map_severity(self, severity: str) -> str:
+        """Map WeatherAPI severity to our frontend severity levels"""
+        severity_lower = severity.lower()
+        if severity_lower in ["extreme", "severe"]:
+            return "high"
+        elif severity_lower in ["moderate", "minor"]:
+            return "medium"
+        else:
+            return "low"
 
 
 weather_service = WeatherService()

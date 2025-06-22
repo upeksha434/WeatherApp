@@ -106,3 +106,14 @@ async def get_hourly_forecast(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get("/alerts/{location}")
+async def get_alerts(location: str):
+    """Get weather alerts for a location"""
+    try:
+        return await weather_service.get_alerts(location)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")

@@ -44,14 +44,14 @@ async def root():
     return {
         "message": "Welcome to Weather App API",
         "version": settings.app_version,
-        "docs": "/docs",
-        "endpoints": {
+        "docs": "/docs",        "endpoints": {
             "current_weather": "/api/weather/current/{location}",
             "forecast": "/api/weather/forecast/{location}",
             "search_locations": "/api/weather/search?q={query}",
             "hourly_forecast": "/api/weather/hourly/{location}",
             "astronomy": "/api/weather/astronomy/{location}",
-            "air_quality": "/api/weather/air-quality/{location}"
+            "air_quality": "/api/weather/air-quality/{location}",
+            "alerts": "/api/weather/alerts/{location}"
         }
     }
 

@@ -6,15 +6,33 @@
       <!-- Weather page icon -->
       <div class="nav-item" [class.active]="isActiveRoute('weather')" (click)="navigateTo('weather')">
         <img src="assets/weather-page.png" alt="Weather Page" class="page-icon" />
+        <span class="nav-label">Weather</span>
+      </div>      <!-- Weather Alerts page icon-->
+      <div class="nav-item" [class.active]="isActiveRoute('alerts')" (click)="navigateTo('alerts')">
+        <iconify-icon icon="mingcute:alert-fill" width="28" height="28"></iconify-icon>
+        <span class="nav-label">Alerts</span>
       </div>
-      
-      <!-- Settings page icon (dummy for now) -->
+      <!-- Settings page icon -->
       <div class="nav-item" [class.active]="isActiveRoute('settings')" (click)="navigateTo('settings')">
-        <svg class="page-icon" viewBox="0 0 24 24" fill="none">
-          <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-        </svg>
+         <iconify-icon icon="clarity:settings-solid" width="28" height="28"></iconify-icon>
+         <span class="nav-label">Settings</span>
       </div>
     </div>
+  </div>
+  
+  <!-- Theme Toggle Button at Bottom -->
+  <div class="theme-toggle-container">
+    <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="'Switch to ' + (currentTheme === 'dark' ? 'light' : 'dark') + ' mode'">
+      <!-- Sun icon for light theme -->
+      <svg *ngIf="currentTheme === 'dark'" class="theme-icon" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      
+      <!-- Moon icon for dark theme -->
+      <svg *ngIf="currentTheme === 'light'" class="theme-icon" viewBox="0 0 24 24" fill="none">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
   </div>
 </aside>

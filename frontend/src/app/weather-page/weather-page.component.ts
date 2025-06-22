@@ -69,10 +69,24 @@ export class WeatherPageComponent implements OnInit {
   currentLocation: string = 'Colombo'; // Default location
   selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
   currentSettings: any;
-  
-  // Popup state
+    // Popup state
   showHourlyPopup = false;
   selectedHourlyData: HourlyForecast | null = null;
+  selectedHourIndex = 0;
+  
+  // Get previous, current, and next hourly data for navigation
+  get navigationHourlyData() {
+    if (!this.hourlyForecast.length) return { previous: null, current: null, next: null };
+    
+    const prevIndex = this.selectedHourIndex - 1;
+    const nextIndex = this.selectedHourIndex + 1;
+    
+    return {
+      previous: prevIndex >= 0 ? this.hourlyForecast[prevIndex] : null,
+      current: this.hourlyForecast[this.selectedHourIndex] || null,
+      next: nextIndex < this.hourlyForecast.length ? this.hourlyForecast[nextIndex] : null
+    };
+  }
 
   constructor(
     private http: HttpClient,
@@ -295,9 +309,10 @@ export class WeatherPageComponent implements OnInit {
     
     console.log('Added mock data. Total forecast days:', this.weeklyForecast.length);
   }
-
   // Popup methods
   openHourlyPopup(hourData: HourlyForecast): void {
+    // Find the index of the selected hour in the forecast array
+    this.selectedHourIndex = this.hourlyForecast.findIndex(h => h.time === hourData.time);
     this.selectedHourlyData = hourData;
     this.showHourlyPopup = true;
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
@@ -306,7 +321,29 @@ export class WeatherPageComponent implements OnInit {
   closeHourlyPopup(): void {
     this.showHourlyPopup = false;
     this.selectedHourlyData = null;
+    this.selectedHourIndex = 0;
     document.body.style.overflow = 'auto'; // Restore scrolling
+  }
+
+  navigateToPrevious(): void {
+    if (this.selectedHourIndex > 0) {
+      this.selectedHourIndex--;
+      this.selectedHourlyData = this.hourlyForecast[this.selectedHourIndex];
+    }
+  }
+
+  navigateToNext(): void {
+    if (this.selectedHourIndex < this.hourlyForecast.length - 1) {
+      this.selectedHourIndex++;
+      this.selectedHourlyData = this.hourlyForecast[this.selectedHourIndex];
+    }
+  }
+
+  navigateToIndex(index: number): void {
+    if (index >= 0 && index < this.hourlyForecast.length) {
+      this.selectedHourIndex = index;
+      this.selectedHourlyData = this.hourlyForecast[index];
+    }
   }
 
   onPopupBackdropClick(event: Event): void {
