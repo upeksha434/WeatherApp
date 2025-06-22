@@ -37,10 +37,10 @@
   <!-- Hourly Forecast Section -->
   <section class="hourly-forecast">
     <h4 class="section-title">HOURLY FORECAST</h4>
-    <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">
-      <div *ngFor="let hour of hourlyForecast" 
+    <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">      <div *ngFor="let hour of hourlyForecast" 
            class="hourly-item"
-           [class.current-hour]="isCurrentHour(hour.time)">        <div class="hour-time">{{ hour.time }}</div>
+           [class.current-hour]="isCurrentHour(hour.time)"
+           (click)="openHourlyPopup(hour)">        <div class="hour-time">{{ hour.time }}</div>
         <img [src]="hour.condition.icon" [alt]="hour.condition.text" class="hour-icon">
         <div class="hour-temp">{{ settingsService.formatTemperature(hour.temp_c) }}</div>
         <div class="hour-rain">{{ hour.chance_of_rain }}%</div>
@@ -107,4 +107,77 @@
     <div class="forecast-row">Loading forecast...</div>
   </ng-template>
 </aside>
+
+<!-- Hourly Forecast Popup Modal -->
+<div class="hourly-popup-overlay" 
+     *ngIf="showHourlyPopup" 
+     (click)="onPopupBackdropClick($event)">
+  <div class="hourly-popup-content" *ngIf="selectedHourlyData">
+    <div class="popup-header">
+      <h3>{{ selectedHourlyData.time }} Forecast</h3>
+      <button class="close-button" (click)="closeHourlyPopup()">
+        <iconify-icon icon="material-symbols:close" width="24" height="24"></iconify-icon>
+      </button>
+    </div>
+    
+    <div class="popup-main-info">
+      <div class="popup-weather-icon">
+        <img [src]="selectedHourlyData.condition.icon" [alt]="selectedHourlyData.condition.text">
+      </div>
+      <div class="popup-temp-info">
+        <div class="popup-temp">{{ settingsService.formatTemperature(selectedHourlyData.temp_c) }}</div>
+        <div class="popup-condition">{{ selectedHourlyData.condition.text }}</div>
+      </div>
+    </div>
+    
+    <div class="popup-details-grid">
+      <div class="popup-detail-item">
+        <iconify-icon icon="wi:raindrop" width="24" height="24" style="color: var(--rain-color)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">Chance of Rain</span>
+          <span class="detail-value">{{ selectedHourlyData.chance_of_rain }}%</span>
+        </div>
+      </div>
+        <div class="popup-detail-item">
+        <iconify-icon icon="carbon:humidity" width="24" height="24" style="color: var(--accent-light)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">Humidity</span>
+          <span class="detail-value">{{ selectedHourlyData.humidity }}%</span>
+        </div>
+      </div>
+      
+      <div class="popup-detail-item">
+        <iconify-icon icon="tabler:wind" width="24" height="24" style="color: var(--accent-light)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">Wind Speed</span>
+          <span class="detail-value">{{ selectedHourlyData.wind_kph }} km/h</span>
+        </div>
+      </div>
+      
+      <div class="popup-detail-item">
+        <iconify-icon icon="wi:thermometer" width="24" height="24" style="color: var(--temp-max)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">Feels Like</span>
+          <span class="detail-value">{{ settingsService.formatTemperature(selectedHourlyData.feelslike_c) }}</span>
+        </div>
+      </div>
+      
+      <div class="popup-detail-item">
+        <iconify-icon icon="material-symbols:speed" width="24" height="24" style="color: var(--accent-light)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">Pressure</span>
+          <span class="detail-value">{{ selectedHourlyData.pressure_mb }} mb</span>
+        </div>
+      </div>
+      
+      <div class="popup-detail-item">
+        <iconify-icon icon="hugeicons:uv-03" width="24" height="24" style="color: var(--accent-light)"></iconify-icon>
+        <div class="detail-info">
+          <span class="detail-label">UV Index</span>
+          <span class="detail-value">{{ selectedHourlyData.uv }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 

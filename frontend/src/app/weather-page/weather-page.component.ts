@@ -32,6 +32,11 @@ interface HourlyForecast {
     icon: string;
   };
   chance_of_rain: number;
+  humidity: number;
+  wind_kph: number;
+  feelslike_c: number;
+  pressure_mb: number;
+  uv: number;
 }
 
 interface DailyForecast {
@@ -64,6 +69,10 @@ export class WeatherPageComponent implements OnInit {
   currentLocation: string = 'Colombo'; // Default location
   selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
   currentSettings: any;
+  
+  // Popup state
+  showHourlyPopup = false;
+  selectedHourlyData: HourlyForecast | null = null;
 
   constructor(
     private http: HttpClient,
@@ -196,13 +205,16 @@ export class WeatherPageComponent implements OnInit {
     });
     
     console.log('Filtered hours count:', filtered.length);
-    
-    return filtered.map(hour => ({
-    //   time: this.formatTime(hour.time),
-      time:new Date(hour.time).getHours().toString().padStart(2, '0') + ':00',
+      return filtered.map(hour => ({
+      time: new Date(hour.time).getHours().toString().padStart(2, '0') + ':00',
       temp_c: hour.temp_c,
       condition: hour.condition,
-      chance_of_rain: hour.chance_of_rain || 0
+      chance_of_rain: hour.chance_of_rain || 0,
+      humidity: hour.humidity || 0,
+      wind_kph: hour.wind_kph || 0,
+      feelslike_c: hour.feelslike_c || hour.temp_c,
+      pressure_mb: hour.pressure_mb || 0,
+      uv: hour.uv || 0
     }));
   }
   formatTime(timeString: string): string {
@@ -282,5 +294,24 @@ export class WeatherPageComponent implements OnInit {
     }
     
     console.log('Added mock data. Total forecast days:', this.weeklyForecast.length);
+  }
+
+  // Popup methods
+  openHourlyPopup(hourData: HourlyForecast): void {
+    this.selectedHourlyData = hourData;
+    this.showHourlyPopup = true;
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  closeHourlyPopup(): void {
+    this.showHourlyPopup = false;
+    this.selectedHourlyData = null;
+    document.body.style.overflow = 'auto'; // Restore scrolling
+  }
+
+  onPopupBackdropClick(event: Event): void {
+    if (event.target === event.currentTarget) {
+      this.closeHourlyPopup();
+    }
   }
 }
