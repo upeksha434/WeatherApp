@@ -1,8 +1,7 @@
 <!-- Main Content Area -->
 <main class="main-content">  <!-- Current Weather Section with Search -->
   <div class="current-weather" *ngIf="weatherData && !loading">
-    <!-- Search Bar -->
-    <div class="search-container">
+    <!-- Search Bar -->    <div class="search-container">
       <div class="search-bar">
         <iconify-icon icon="material-symbols:search" class="search-icon" width="20" height="20"></iconify-icon>
         <input 
@@ -10,10 +9,30 @@
           placeholder="Search for a city..." 
           class="search-input"
           [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          (keydown)="onSearchKeyDown($event)"
+          (focus)="onSearchFocus()"
+          (blur)="hideSuggestions()"
           (keyup.enter)="searchWeather()"
-          #searchInput>        <button class="search-button" (click)="searchWeather()">
+          #searchInput>
+        <button class="search-button" (click)="searchWeather()">
           Search
         </button>
+        
+        <!-- Autocomplete Suggestions Dropdown -->
+        <div class="suggestions-dropdown" *ngIf="showSuggestions">
+          <div 
+            *ngFor="let suggestion of searchSuggestions; let i = index"
+            class="suggestion-item"
+            [class.selected]="i === selectedSuggestionIndex"
+            (mousedown)="selectSuggestion(suggestion)"
+            (mouseover)="selectedSuggestionIndex = i">
+            <div class="suggestion-main">
+              <span class="city-name">{{ suggestion.name }}</span>
+              <span class="region-country">{{ suggestion.region }}, {{ suggestion.country }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

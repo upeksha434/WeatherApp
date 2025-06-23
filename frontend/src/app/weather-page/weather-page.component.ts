@@ -1,9 +1,11 @@
 import { Component, OnInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../services/settings.service';
 import { LocationService } from '../services/location.service';
+import { SearchService, CityLocation } from '../services/search.service';
+import { Subject } from 'rxjs';
 
 interface WeatherData {
   location?: {
@@ -58,7 +60,7 @@ interface DailyForecast {
 @Component({
   selector: 'app-weather-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './weather-page.component.html',
   styleUrl: './weather-page.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -72,7 +74,14 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
   currentLocation: string = 'Colombo'; // Default location
   selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
   currentSettings: any;
-    // Popup state
+  
+  // Autocomplete properties
+  searchSuggestions: CityLocation[] = [];
+  showSuggestions: boolean = false;
+  selectedSuggestionIndex: number = -1;
+  private searchSubject = new Subject<string>();
+  
+  // Popup state
   showHourlyPopup = false;
   selectedHourlyData: HourlyForecast | null = null;
   selectedHourIndex = 0;
@@ -89,11 +98,11 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
       current: this.hourlyForecast[this.selectedHourIndex] || null,
       next: nextIndex < this.hourlyForecast.length ? this.hourlyForecast[nextIndex] : null
     };
-  }
-  constructor(
+  }  constructor(
     private http: HttpClient,
     public settingsService: SettingsService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private searchService: SearchService
   ) {
     this.currentSettings = this.settingsService.getSettings();
   }
@@ -108,21 +117,90 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
     this.locationService.currentLocation$.subscribe(location => {
       this.currentLocation = location;
       console.log('Weather page: Current location updated to:', location);
-      // Load all weather data in one optimized call
+      // Load weather data for the new location
       this.loadAllWeatherData();
     });
+
+    // Set up autocomplete search
+    this.setupAutocomplete();
 
     console.log('Weather page initialized');
   }
 
+  // Setup autocomplete functionality
+  private setupAutocomplete(): void {
+    const debouncedSearch = this.searchService.createDebouncedSearch();
+    debouncedSearch(this.searchSubject.asObservable()).subscribe(suggestions => {
+      this.searchSuggestions = suggestions;
+      this.showSuggestions = suggestions.length > 0 && this.searchQuery.trim().length >= 3;
+      this.selectedSuggestionIndex = -1;
+    });
+  }
   // Search for weather in a new location
   searchWeather() {
     if (this.searchQuery && this.searchQuery.trim()) {
       // Use location service to set the new location
       this.locationService.setCurrentLocation(this.searchQuery.trim());
       this.searchQuery = ''; // Clear search input after search
+      this.hideSuggestions(); // Hide suggestions after search
     }
-  }  // Optimized method to load all weather data in one API call
+  }
+
+  // Handle search input changes
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  // Handle keyboard navigation in suggestions
+  onSearchKeyDown(event: KeyboardEvent): void {
+    if (!this.showSuggestions) return;
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.selectedSuggestionIndex = Math.min(
+          this.selectedSuggestionIndex + 1,
+          this.searchSuggestions.length - 1
+        );
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.selectedSuggestionIndex = Math.max(this.selectedSuggestionIndex - 1, -1);
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.selectedSuggestionIndex >= 0) {
+          this.selectSuggestion(this.searchSuggestions[this.selectedSuggestionIndex]);
+        } else {
+          this.searchWeather();
+        }
+        break;
+      case 'Escape':
+        this.hideSuggestions();
+        break;
+    }
+  }
+
+  // Select a suggestion from the dropdown
+  selectSuggestion(suggestion: CityLocation): void {
+    const locationName = `${suggestion.name}, ${suggestion.region}, ${suggestion.country}`;
+    this.searchQuery = locationName;
+    this.hideSuggestions();
+    this.locationService.setCurrentLocation(locationName);
+  }
+
+  // Hide suggestions dropdown
+  hideSuggestions(): void {
+    this.showSuggestions = false;
+    this.selectedSuggestionIndex = -1;
+  }
+
+  // Focus on suggestions dropdown
+  onSearchFocus(): void {
+    if (this.searchQuery.trim().length >= 3 && this.searchSuggestions.length > 0) {
+      this.showSuggestions = true;
+    }
+  }// Optimized method to load all weather data in one API call
   loadAllWeatherData() {
     console.log('Starting to load all weather data for:', this.currentLocation);
     this.loading = true;
