@@ -76,7 +76,7 @@
 
 .nav-item.active .page-icon {
   filter: brightness(1.2) grayscale(0);
-  color: white;
+  color: rgb(170, 170, 170);
 }
 
 .nav-label {
@@ -97,7 +97,10 @@
 .nav-item:hover .nav-label {
   color: var(--text-primary);
 }
-
+.nav-icons:hover .page-icon {
+  filter: brightness(1) grayscale(0);
+  transform: scale(1.1);
+}
 /* Theme Toggle Container */
 .theme-toggle-container {
   margin-top: auto;

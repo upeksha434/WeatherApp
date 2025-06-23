@@ -173,13 +173,8 @@
   transition: background-color 0.2s ease;
 }
 
-.search-button:hover:not(:disabled) {
+.search-button:hover {
   background-color: var(--accent-hover);
-}
-
-.search-button:disabled {
-  background-color: var(--text-muted);
-  cursor: not-allowed;
 }
 
 /* Weather Content */
@@ -567,6 +562,87 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Loading States */
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 30px;
+  border-radius: 16px;
+  gap: 20px;
+}
+
+.loading-skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-quaternary) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.location-skeleton {
+  height: 2.5rem;
+  width: 60%;
+  margin-bottom: 1rem;
+}
+
+.condition-skeleton {
+  height: 1.2rem;
+  width: 40%;
+  margin-bottom: 0.5rem;
+}
+
+.temperature-skeleton {
+  height: 3rem;
+  width: 30%;
+  margin-top: 1rem;
+}
+
+.icon-skeleton {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+}
+
+.hourly-loading {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.hourly-item-skeleton {
+  background: var(--bg-tertiary);
+  padding: 12px 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hourly-skeleton-time {
+  height: 1rem;
+  width: 80%;
+}
+
+.hourly-skeleton-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.hourly-skeleton-temp {
+  height: 1rem;
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -978,4 +1054,30 @@
     min-width: 60px;
     padding: 8px;
   }
+}
+
+.location-details {
+  margin-top: 0.5rem;
+}
+
+.timezone-info {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timezone {
+  background: var(--bg-tertiary);
+  padding: 0.25rem 0.2rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.local-time {
+  font-weight: 500;
+  color: var(--accent-primary);
 }

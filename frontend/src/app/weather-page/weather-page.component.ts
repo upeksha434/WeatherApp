@@ -3,12 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../services/settings.service';
+import { LocationService } from '../services/location.service';
 
 interface WeatherData {
   location?: {
     name: string;
     region: string;
     country: string;
+    tz_id?: string;
+    localtime?: string;
   };
   current?: {
     temp_c: number;
@@ -60,12 +63,12 @@ interface DailyForecast {
   styleUrl: './weather-page.component.css',
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class WeatherPageComponent implements OnInit {
-  weatherData: WeatherData | null = null;
+export class WeatherPageComponent implements OnInit {  weatherData: WeatherData | null = null;
   hourlyForecast: HourlyForecast[] = [];
   weeklyForecast: DailyForecast[] = [];
   loading = false;
-  error: string | null = null;  searchQuery: string = '';
+  fallbackLoading = false; // Separate loading state for fallback calls
+  error: string | null = null;searchQuery: string = '';
   currentLocation: string = 'Colombo'; // Default location
   selectedHours = ['00:00','03:00','06:00', '09:00', '12:00', '15:00', '18:00', '21:00']; // 6am, 9am, 12pm, 3pm, 6pm, 9pm
   currentSettings: any;
@@ -87,103 +90,170 @@ export class WeatherPageComponent implements OnInit {
       next: nextIndex < this.hourlyForecast.length ? this.hourlyForecast[nextIndex] : null
     };
   }
-
   constructor(
     private http: HttpClient,
-    public settingsService: SettingsService
+    public settingsService: SettingsService,
+    private locationService: LocationService
   ) {
     this.currentSettings = this.settingsService.getSettings();
   }
-
   ngOnInit() {
     // Subscribe to settings changes
     this.settingsService.settings$.subscribe(settings => {
       this.currentSettings = settings;
       console.log('Weather page: Settings updated:', settings);
+      // Update default location in location service
+      this.locationService.setDefaultLocation(settings.defaultLocation);
+    });    // Subscribe to current location changes
+    this.locationService.currentLocation$.subscribe(location => {
+      this.currentLocation = location;
+      console.log('Weather page: Current location updated to:', location);
+      // Load all weather data in one optimized call
+      this.loadAllWeatherData();
     });
 
-    // Load weather data for the saved default location
-    const defaultLocation = this.currentSettings.defaultLocation || 'Colombo';
-    this.currentLocation = defaultLocation;
-    console.log('Loading weather for default location:', defaultLocation);
-    
-    console.log('Weather page initialized, loading weather data...');
-    this.loadWeatherData();
-    this.loadHourlyForecast();
-    this.loadWeeklyForecast();
+    console.log('Weather page initialized');
   }
+
   // Search for weather in a new location
   searchWeather() {
     if (this.searchQuery && this.searchQuery.trim()) {
-      this.currentLocation = this.searchQuery.trim();
-      this.loadWeatherData();
-      this.loadHourlyForecast();
-      this.loadWeeklyForecast();
+      // Use location service to set the new location
+      this.locationService.setCurrentLocation(this.searchQuery.trim());
       this.searchQuery = ''; // Clear search input after search
     }
-  }
-  
-  loadWeatherData() {
-    console.log('Starting to load weather data...');
+  }  // Optimized method to load all weather data in one API call
+  loadAllWeatherData() {
+    console.log('Starting to load all weather data for:', this.currentLocation);
     this.loading = true;
     this.error = null;
     
-    const apiUrl = `http://localhost:8000/api/weather/current/${this.currentLocation}`;
-    console.log('Making HTTP request to:', apiUrl);
-    this.http.get<WeatherData>(apiUrl)
+    // Use forecast endpoint which includes current weather, hourly, and daily data
+    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7&aqi=true&alerts=true`;
+    console.log('Making optimized API request to:', apiUrl);
+    
+    this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
-          console.log('Weather data received:', data);
-          this.weatherData = data;
-          console.log('Parsed weather data:', this.weatherData);
+          console.log('All weather data received:', data);
+          
+          // Extract current weather data
+          this.weatherData = {
+            location: data.location,
+            current: data.current
+          };
+          
+          // Extract and process hourly forecast from first day
+          if (data.forecast?.forecastday?.[0]?.hour) {
+            this.hourlyForecast = this.filterHourlyData(data.forecast.forecastday[0].hour);
+          }
+          
+          // Extract and process weekly forecast
+          if (data.forecast?.forecastday) {
+            this.weeklyForecast = this.processForecastData(data.forecast.forecastday);
+          }
+          
+          console.log('Processed weather data:', {
+            current: this.weatherData,
+            hourly: this.hourlyForecast.length,
+            weekly: this.weeklyForecast.length
+          });
+          
           this.loading = false;
         },
         error: (err) => {
-          console.error('Weather API error:', err);
-          this.error = 'Failed to load weather data...';
+          console.error('Weather API error:', err);          this.error = 'Failed to load weather data...';
           this.loading = false;
+            // Fallback to individual API calls if the combined call fails
+          console.log('Falling back to individual API calls...');
+          this.fallbackLoading = true;
+          // Reset fallback completion tracking
+          this.fallbackCallsComplete = { weather: false, hourly: false, weekly: false };
+          this.loadWeatherDataFallback();
+          this.loadHourlyForecastFallback();
+          this.loadWeeklyForecastFallback();
+        }
+      });
+  }  // Keep existing individual methods as fallback
+  loadWeatherDataFallback() {
+    console.log('Starting fallback weather data load...');
+    
+    const apiUrl = `http://localhost:8000/api/weather/current/${this.currentLocation}`;
+    console.log('Making fallback HTTP request to:', apiUrl);
+    this.http.get<WeatherData>(apiUrl)
+      .subscribe({
+        next: (data) => {
+          console.log('Fallback weather data received:', data);
+          this.weatherData = data;
+          console.log('Parsed fallback weather data:', this.weatherData);
+          this.checkFallbackComplete();
+        },
+        error: (err) => {
+          console.error('Fallback Weather API error:', err);
+          this.error = 'Failed to load weather data...';
+          this.fallbackLoading = false;
         }
       });
   }
-  loadHourlyForecast() {
-    console.log('Loading hourly forecast...');
+    loadHourlyForecastFallback() {
+    console.log('Loading fallback hourly forecast...');
     const apiUrl = `http://localhost:8000/api/weather/hourly/${this.currentLocation}?hours=24`;
     this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
-          console.log('Hourly forecast data:', data);
-          // The API returns data.hourly directly, not data.forecast.forecastday[0].hour
+          console.log('Fallback hourly forecast data:', data);
           this.hourlyForecast = this.filterHourlyData(data.hourly || []);
-          console.log('Filtered hourly forecast:', this.hourlyForecast);
+          console.log('Filtered fallback hourly forecast:', this.hourlyForecast);
+          this.checkFallbackComplete();
         },
         error: (err) => {
-          console.error('Hourly forecast error:', err);
+          console.error('Fallback hourly forecast error:', err);
+          this.checkFallbackComplete();
         }
       });
-  }  loadWeeklyForecast() {
-    console.log('Loading 7-day forecast...');
+  }
+    loadWeeklyForecastFallback() {
+    console.log('Loading fallback 7-day forecast...');
     const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7`;
     this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
-          console.log('7-day forecast data:', data);
-          console.log('Forecast days count:', data.forecast?.forecastday?.length || 0);
+          console.log('Fallback 7-day forecast data:', data);
+          console.log('Fallback forecast days count:', data.forecast?.forecastday?.length || 0);
           
           // Process the forecast data
           this.weeklyForecast = this.processForecastData(data.forecast?.forecastday || []);
-          console.log('Processed weekly forecast:', this.weeklyForecast);
-          console.log('Weekly forecast count:', this.weeklyForecast.length);
+          console.log('Processed fallback weekly forecast:', this.weeklyForecast);
+          console.log('Fallback weekly forecast count:', this.weeklyForecast.length);
           
           // If we only get 3 days, let's add some mock data for demonstration
           if (this.weeklyForecast.length < 7) {
             console.log('Only received', this.weeklyForecast.length, 'days. Adding mock data for remaining days.');
             this.addMockForecastDays();
           }
+          this.checkFallbackComplete();
         },
         error: (err) => {
-          console.error('7-day forecast error:', err);
+          console.error('Fallback 7-day forecast error:', err);
+          this.checkFallbackComplete();
         }
       });
+  }
+
+  // Check if all fallback calls are complete
+  private fallbackCallsComplete = { weather: false, hourly: false, weekly: false };
+  
+  checkFallbackComplete() {
+    // Simple completion tracking - this is basic but works
+    this.fallbackCallsComplete.weather = !!this.weatherData;
+    this.fallbackCallsComplete.hourly = this.hourlyForecast.length > 0;
+    this.fallbackCallsComplete.weekly = this.weeklyForecast.length > 0;
+    
+    const allComplete = Object.values(this.fallbackCallsComplete).every(Boolean);
+    if (allComplete) {
+      this.fallbackLoading = false;
+      console.log('All fallback calls completed');
+    }
   }
 
   // Process forecast data to match our interface
@@ -201,25 +271,22 @@ export class WeatherPageComponent implements OnInit {
       }
     }));
   }
-
   // Filter hourly data to show only selected hours
   filterHourlyData(hourlyData: any[]): HourlyForecast[] {
-    const currentHour = new Date().getHours();
-    console.log('Current hour:', currentHour);
+    const currentHour = this.getCurrentHourInLocationTimezone();
+    console.log('Current hour in location timezone:', currentHour);
     console.log('Selected hours:', this.selectedHours);
     
     const filtered = hourlyData.filter(hour => {
       const hourTime = new Date(hour.time).getHours();
       const hourString = hourTime.toString().padStart(2, '0') + ':00';
       const isSelectedHour = this.selectedHours.includes(hourString);
-      // const isCurrentOrFuture = hourTime >= currentHour;
       
-      // console.log(`Hour ${hourTime} (${hourString}): selected=${isSelectedHour}, future=${isCurrentOrFuture}`);
       return isSelectedHour;
     });
     
     console.log('Filtered hours count:', filtered.length);
-      return filtered.map(hour => ({
+    return filtered.map(hour => ({
       time: new Date(hour.time).getHours().toString().padStart(2, '0') + ':00',
       temp_c: hour.temp_c,
       condition: hour.condition,
@@ -238,15 +305,15 @@ export class WeatherPageComponent implements OnInit {
       hour12: true 
     });
   }
-
   // Check if the given hour block represents the current or next relevant hour
   isCurrentHour(hourTime: string): boolean {
-    const currentHour = new Date().getHours();
+    // Get current hour in the location's timezone
+    const currentHour = this.getCurrentHourInLocationTimezone();
     
     // Extract hour from the hourTime string (format: "HH:00")
     const forecastHour = parseInt(hourTime.split(':')[0]);
     
-    // Find the next relevant forecast hour based on current time
+    // Find the next relevant forecast hour based on current time in location's timezone
     let nextRelevantHour = -1;
     for (let selectedHour of this.selectedHours) {
       const selectedHourNum = parseInt(selectedHour.split(':')[0]);
@@ -262,6 +329,31 @@ export class WeatherPageComponent implements OnInit {
     }
     
     return forecastHour === nextRelevantHour;
+  }
+
+  // Get current hour in the location's timezone
+  getCurrentHourInLocationTimezone(): number {
+    if (this.weatherData?.location?.localtime) {
+      // Use the localtime from the API response which is already in the location's timezone
+      const localTime = new Date(this.weatherData.location.localtime);
+      return localTime.getHours();
+    }
+    
+    // Fallback to local timezone if no location time available
+    return new Date().getHours();
+  }
+
+  // Get formatted local time for display
+  getLocationLocalTime(): string {
+    if (this.weatherData?.location?.localtime) {
+      const localTime = new Date(this.weatherData.location.localtime);
+      return localTime.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      });
+    }
+    return '';
   }
 
   // Format date to display proper day names
@@ -350,5 +442,10 @@ export class WeatherPageComponent implements OnInit {
     if (event.target === event.currentTarget) {
       this.closeHourlyPopup();
     }
+  }
+
+  // Get timezone ID for display
+  getTimezoneId(): string {
+    return this.weatherData?.location?.tz_id || '';
   }
 }

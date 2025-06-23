@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { SettingsService } from '../services/settings.service';
 import { AlertsService, WeatherAlert } from '../services/alerts.service';
+import { LocationService } from '../services/location.service';
 
 @Component({
   selector: 'app-alerts-page',
@@ -14,15 +15,17 @@ import { AlertsService, WeatherAlert } from '../services/alerts.service';
 export class AlertsPageComponent implements OnInit {
   private settingsService = inject(SettingsService);
   private alertsService = inject(AlertsService);
+  private locationService = inject(LocationService);
   
   alerts: WeatherAlert[] = [];
   unreadCount: number = 0;
   isLoading: boolean = false;
   currentLocation: string = 'Colombo';
+
   ngOnInit() {
-    // Get current location from settings
-    this.settingsService.settings$.subscribe(settings => {
-      this.currentLocation = settings.defaultLocation;
+    // Subscribe to current location changes
+    this.locationService.currentLocation$.subscribe(location => {
+      this.currentLocation = location;
       this.loadAlerts();
     });
   }loadAlerts() {

@@ -11,7 +11,7 @@
           class="search-input"
           [(ngModel)]="searchQuery"
           (keyup.enter)="searchWeather()"
-          #searchInput>        <button class="search-button" (click)="searchWeather()" [disabled]="!searchQuery.trim()">
+          #searchInput>        <button class="search-button" (click)="searchWeather()">
           Search
         </button>
       </div>
@@ -19,11 +19,15 @@
 
     <!-- Weather Info -->
     <div class="weather-content">
-      <div class="weather-info">
-        <h2>
+      <div class="weather-info">        <h2>
           <span style="font-size: 2em;">{{ weatherData.location?.name }}</span>
           <span style="font-size: 1em; color: gray; margin-left: 8px;">{{ weatherData.location?.country }}</span>
-        </h2>        <p>{{ weatherData.current?.condition?.text }}</p>
+        </h2>        <div class="location-details" *ngIf="getTimezoneId() || getLocationLocalTime()">
+          <p class="timezone-info">
+            <span *ngIf="getTimezoneId()" class="timezone">{{ getTimezoneId() }}</span>
+            <span *ngIf="getLocationLocalTime()" class="timezone">{{ getLocationLocalTime() }}</span>
+          </p>
+        </div><p>{{ weatherData.current?.condition?.text }}</p>
         <p class="rain-chance">Chance of rain: 0%</p> <!-- Optional -->
         <h1 class="temperature">{{ settingsService.formatTemperature(weatherData.current?.temp_c || 0) }}</h1>
         <!-- <p class="feels-like">Feels like {{ weatherData.current?.temp_f }}°F</p> -->
@@ -36,18 +40,30 @@
   </div>
   <!-- Hourly Forecast Section -->
   <section class="hourly-forecast">
-    <h4 class="section-title">HOURLY FORECAST</h4>
-    <div class="hourly-grid" *ngIf="hourlyForecast.length > 0">      <div *ngFor="let hour of hourlyForecast" 
+    <h4 class="section-title">HOURLY FORECAST</h4>    <div class="hourly-grid" *ngIf="hourlyForecast.length > 0 && !loading">
+      <div *ngFor="let hour of hourlyForecast" 
            class="hourly-item"
            [class.current-hour]="isCurrentHour(hour.time)"
-           (click)="openHourlyPopup(hour)">        <div class="hour-time">{{ hour.time }}</div>
+           (click)="openHourlyPopup(hour)">
+        <div class="hour-time">{{ hour.time }}</div>
         <img [src]="hour.condition.icon" [alt]="hour.condition.text" class="hour-icon">
         <div class="hour-temp">{{ settingsService.formatTemperature(hour.temp_c) }}</div>
         <div class="hour-rain">{{ hour.chance_of_rain }}%</div>
       </div>
     </div>
-    <div *ngIf="hourlyForecast.length === 0" class="no-hourly-data">
-      <p>Loading hourly forecast...</p>
+    
+    <!-- Loading State for Hourly Forecast -->
+    <div class="hourly-loading" *ngIf="loading">
+      <div class="hourly-item-skeleton" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+        <div class="loading-skeleton hourly-skeleton-time"></div>
+        <div class="loading-skeleton hourly-skeleton-icon"></div>
+        <div class="loading-skeleton hourly-skeleton-temp"></div>
+        <div class="loading-skeleton hourly-skeleton-temp"></div>
+      </div>
+    </div>
+    
+    <div *ngIf="hourlyForecast.length === 0 && !loading" class="no-hourly-data">
+      <p>No hourly forecast data available.</p>
     </div>
   </section>
 
@@ -242,4 +258,38 @@
     </div>
   </div>
 </div>
+
+<!-- Loading State for Current Weather -->
+<div class="current-weather loading-section" *ngIf="loading">
+    <div class="search-container">
+      <div class="search-bar">
+        <iconify-icon icon="material-symbols:search" class="search-icon" width="20" height="20"></iconify-icon>
+        <input 
+          type="text" 
+          placeholder="Search for a city..." 
+          class="search-input" 
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="searchWeather()"
+          [disabled]="loading">
+        <button 
+          class="search-button" 
+          (click)="searchWeather()" 
+          [disabled]="loading || !searchQuery.trim()">
+          <span *ngIf="!loading">Search</span>
+          <span *ngIf="loading">Loading...</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="weather-content">
+      <div class="weather-info">
+        <div class="loading-skeleton location-skeleton"></div>
+        <div class="loading-skeleton condition-skeleton"></div>
+        <div class="loading-skeleton temperature-skeleton"></div>
+      </div>
+      <div class="weather-icon">
+        <div class="loading-skeleton icon-skeleton"></div>
+      </div>
+    </div>
+  </div>
 
