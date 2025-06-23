@@ -55,16 +55,18 @@ export class LocationService {
       this.currentLocationSubject.next(trimmedLocation);
       this.saveCurrentLocation(trimmedLocation);
     }
-  }
-
-  // Set default location (from settings)
+  }  // Set default location (from settings)
   setDefaultLocation(location: string): void {
     this.defaultLocation = location;
-    // Only update current location if no custom location has been set
-    const currentStored = localStorage.getItem(this.STORAGE_KEY);
-    if (!currentStored) {
-      this.setCurrentLocation(location);
-    }
+    console.log('Setting default location to:', location);
+    // Don't automatically update current location - only update when explicitly requested
+  }
+
+  // Update current location to the default (used when changing default in settings)
+  updateCurrentToDefault(defaultLocation: string): void {
+    this.defaultLocation = defaultLocation;
+    console.log('Setting default location and updating current location to:', defaultLocation);
+    this.setCurrentLocation(defaultLocation);
   }
 
   // Reset to default location (useful for settings page)

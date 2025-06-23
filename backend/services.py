@@ -31,17 +31,14 @@ class WeatherService:
             except httpx.RequestError as e:
                 raise ValueError(f"Network error: {str(e)}")
     
-    async def get_current_weather(self, location: str, aqi: bool = True) -> CurrentWeatherResponse:
+    async def get_current_weather(self, location: str) -> CurrentWeatherResponse:
         """Get current weather for a location"""
-        params = {
-            "q": location,
-            "aqi": "yes" if aqi else "no"
-        }
+        params = {"q": location}
         
         data = await self._make_request("current.json", params)
         return CurrentWeatherResponse(**data)
     
-    async def get_forecast(self, location: str, days: int = 7, aqi: bool = True, alerts: bool = True) -> ForecastResponse:
+    async def get_forecast(self, location: str, days: int = 7, alerts: bool = True) -> ForecastResponse:
         """Get weather forecast for a location"""
         if days < 1 or days > 10:
             raise ValueError("Days must be between 1 and 10")
@@ -49,10 +46,8 @@ class WeatherService:
         params = {
             "q": location,
             "days": days,
-            "aqi": "yes" if aqi else "no",
             "alerts": "yes" if alerts else "no"
-        }
-        
+        }        
         data = await self._make_request("forecast.json", params)
         return ForecastResponse(**data)
     
@@ -62,25 +57,6 @@ class WeatherService:
         
         data = await self._make_request("search.json", params)
         return [SearchLocation(**location) for location in data]
-    
-    async def get_astronomy(self, location: str, date: Optional[str] = None) -> dict:
-        """Get astronomy data for a location"""
-        params = {"q": location}
-        if date:
-            params["dt"] = date
-            
-        data = await self._make_request("astronomy.json", params)
-        return data
-    
-    async def get_air_quality(self, location: str) -> dict:
-        """Get air quality data for a location"""
-        params = {
-            "q": location,
-            "aqi": "yes"
-        }
-        
-        data = await self._make_request("current.json", params)
-        return data.get("current", {}).get("air_quality", {})
     
     async def get_alerts(self, location: str) -> dict:
         """Get weather alerts for a location"""

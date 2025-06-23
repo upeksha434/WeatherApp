@@ -7,16 +7,11 @@ router = APIRouter()
 
 
 @router.get("/current/{location}", response_model=CurrentWeatherResponse)
-
-async def get_current_weather(
-    
-    location: str,
-    aqi: bool = Query(True, description="Include air quality data")
-):
+async def get_current_weather(location: str):
     """Get current weather for a specific location"""
-    print(f"[REQUEST RECEIVED] Location: {location}, AQI: {aqi}")
+    print(f"[REQUEST RECEIVED] Location: {location}")
     try:
-        return await weather_service.get_current_weather(location, aqi)
+        return await weather_service.get_current_weather(location)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -27,12 +22,11 @@ async def get_current_weather(
 async def get_forecast(
     location: str,
     days: int = Query(7, ge=1, le=10, description="Number of days (1-10)"),
-    aqi: bool = Query(True, description="Include air quality data"),
     alerts: bool = Query(True, description="Include weather alerts")
 ):
     """Get weather forecast for a specific location"""
     try:
-        return await weather_service.get_forecast(location, days, aqi, alerts)
+        return await weather_service.get_forecast(location, days, alerts)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -51,30 +45,6 @@ async def search_locations(
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
-
-@router.get("/astronomy/{location}")
-async def get_astronomy(
-    location: str,
-    date: Optional[str] = Query(None, description="Date in YYYY-MM-DD format")
-):
-    """Get astronomy data for a location"""
-    try:
-        return await weather_service.get_astronomy(location, date)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/air-quality/{location}")
-async def get_air_quality(location: str):
-    """Get air quality data for a location"""
-    try:
-        return await weather_service.get_air_quality(location)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/hourly/{location}")

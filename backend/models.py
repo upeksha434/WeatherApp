@@ -44,17 +44,6 @@ class Current(BaseModel):
     gust_kph: float
 
 
-class AirQuality(BaseModel):
-    co: float
-    no2: float
-    o3: float
-    so2: float
-    pm2_5: float
-    pm10: float
-    us_epa_index: int
-    gb_defra_index: int
-
-
 class CurrentWeatherResponse(BaseModel):
     location: Location
     current: Current
@@ -95,15 +84,6 @@ class HourlyForecast(BaseModel):
     uv: float
 
 
-class Astro(BaseModel):
-    sunrise: str
-    sunset: str
-    moonrise: str
-    moonset: str
-    moon_phase: str
-    moon_illumination: int
-
-
 class Day(BaseModel):
     maxtemp_c: float
     maxtemp_f: float
@@ -131,7 +111,6 @@ class ForecastDay(BaseModel):
     date: str
     date_epoch: int
     day: Day
-    astro: Astro
     hour: List[HourlyForecast]
 
 

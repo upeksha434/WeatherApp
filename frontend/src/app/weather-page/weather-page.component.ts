@@ -105,26 +105,40 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
     private searchService: SearchService
   ) {
     this.currentSettings = this.settingsService.getSettings();
-  }
-  ngOnInit() {
+  }  ngOnInit() {
     // Subscribe to settings changes
     this.settingsService.settings$.subscribe(settings => {
       this.currentSettings = settings;
       console.log('Weather page: Settings updated:', settings);
-      // Update default location in location service
-      this.locationService.setDefaultLocation(settings.defaultLocation);
-    });    // Subscribe to current location changes
+      // Don't automatically update location here - only update when explicitly changed in settings
+    });
+
+    // Subscribe to current location changes
     this.locationService.currentLocation$.subscribe(location => {
       this.currentLocation = location;
       console.log('Weather page: Current location updated to:', location);
-      // Load weather data for the new location
-      this.loadAllWeatherData();
+      // Only load weather data if we have weather data or if location actually changed
+      if (!this.weatherData || this.shouldLoadWeatherData(location)) {
+        this.loadAllWeatherData();
+      }
     });
 
     // Set up autocomplete search
     this.setupAutocomplete();
 
     console.log('Weather page initialized');
+  }
+
+  // Check if we should load weather data for the new location
+  private shouldLoadWeatherData(newLocation: string): boolean {
+    // If no current weather data, always load
+    if (!this.weatherData) {
+      return true;
+    }
+    
+    // If location is different from what we currently have, load new data
+    const currentLocationName = this.weatherData.location?.name;
+    return currentLocationName?.toLowerCase() !== newLocation.toLowerCase();
   }
 
   // Setup autocomplete functionality
@@ -205,9 +219,8 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
     console.log('Starting to load all weather data for:', this.currentLocation);
     this.loading = true;
     this.error = null;
-    
-    // Use forecast endpoint which includes current weather, hourly, and daily data
-    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7&aqi=true&alerts=true`;
+      // Use forecast endpoint which includes current weather, hourly, and daily data
+    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7&alerts=true`;
     console.log('Making optimized API request to:', apiUrl);
     
     this.http.get<any>(apiUrl)
