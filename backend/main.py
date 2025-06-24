@@ -19,10 +19,22 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Temporarily allow all origins for debugging
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "https://weather-app-neon-theta-84.vercel.app",
+        "https://*.vercel.app",
+        "*"  # Temporarily allow all origins for debugging
+    ],
+    allow_credentials=False,  # Changed to False when allowing all origins
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+    ],
+    expose_headers=["*"],
 )
 
 # Include weather routes
