@@ -7,6 +7,7 @@ import { LocationService } from '../services/location.service';
 import { SearchService, CityLocation } from '../services/search.service';
 import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Logger } from '../utils/logger';
 
 interface WeatherData {
   location?: {
@@ -217,16 +218,15 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
     }
   }// Optimized method to load all weather data in one API call
   loadAllWeatherData() {
-    console.log('Starting to load all weather data for:', this.currentLocation);
+    Logger.log('Starting to load all weather data for:', this.currentLocation);
     this.loading = true;
     this.error = null;    // Use forecast endpoint which includes current weather, hourly, and daily data
     const apiUrl = `${environment.apiUrl}/forecast/${this.currentLocation}?days=7&alerts=true`;
-    console.log('Making optimized API request to:', apiUrl);
+    Logger.log('Making optimized API request to:', apiUrl);
     
     this.http.get<any>(apiUrl)
-      .subscribe({
-        next: (data) => {
-          console.log('All weather data received:', data);
+      .subscribe({        next: (data) => {
+          Logger.log('All weather data received:', data);
           
           // Extract current weather data
           this.weatherData = {
@@ -243,17 +243,15 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
           if (data.forecast?.forecastday) {
             this.weeklyForecast = this.processForecastData(data.forecast.forecastday);
           }
-          
-          console.log('Processed weather data:', {
+            Logger.log('Processed weather data:', {
             current: this.weatherData,
             hourly: this.hourlyForecast.length,
             weekly: this.weeklyForecast.length
           });
           
           this.loading = false;
-        },
-        error: (err) => {
-          console.error('Weather API error:', err);          this.error = 'Failed to load weather data...';
+        },        error: (err) => {
+          Logger.error('Weather API error:', err);this.error = 'Failed to load weather data...';
           this.loading = false;
             // Fallback to individual API calls if the combined call fails
           console.log('Falling back to individual API calls...');

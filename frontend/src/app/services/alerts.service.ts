@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { Logger } from '../utils/logger';
 
 export interface WeatherAlert {
   id: string;
@@ -37,10 +38,9 @@ export class AlertsService {
             ...alert,
             timestamp: alert.timestamp ? new Date(alert.timestamp) : new Date()
           }))
-        })),
-        catchError(error => {
-          console.error('Error fetching alerts:', error);
-          console.log('Using mock data as fallback due to API error');
+        })),        catchError(error => {
+          Logger.error('Error fetching alerts:', error);
+          Logger.log('Using mock data as fallback due to API error');
           // Only return mock data if there's a real API error, not when there are no alerts
           return of({
             location: { name: location },
