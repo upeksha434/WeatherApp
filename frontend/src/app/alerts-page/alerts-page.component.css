@@ -1,9 +1,24 @@
+/* Alerts Page - Work with inherited grid structure like settings page */
+:host {
+  display: contents; /* Makes the component transparent to the parent grid */
+}
+
+.alerts-page {
+  grid-column: 2 / 4; /* Span across main content and forecast panel areas */
+  background-color: var(--bg-primary);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .alerts-container {
   padding: 1.5rem;
-  max-width: 1000px;
-  margin: 0 1.5rem;
+  width: 100%;
+  margin: 0;
   background: var(--bg-primary);
   min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
 }
 
 .alerts-header {

@@ -1,4 +1,5 @@
-<div class="alerts-container">
+<main class="alerts-page">
+  <div class="alerts-container">
   <div class="alerts-header">
     <h1>Weather Alerts - {{ currentLocation }}</h1>
     <div class="alerts-actions">
@@ -95,11 +96,11 @@
       <iconify-icon icon="material-symbols:notifications-off"></iconify-icon>
       <h2>No Weather Alerts</h2>
       <p>There are currently no active weather alerts for <strong>{{ currentLocation }}</strong>.</p>
-      <p>We'll keep monitoring and notify you of any weather warnings or advisories in your area.</p>
-      <button class="refresh-btn" (click)="loadAlerts()">
+      <p>We'll keep monitoring and notify you of any weather warnings or advisories in your area.</p>      <button class="refresh-btn" (click)="loadAlerts()">
         <iconify-icon icon="material-symbols:refresh"></iconify-icon>
         Check Again
       </button>
     </div>
   </ng-template>
-</div>
+  </div>
+</main>
