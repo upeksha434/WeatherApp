@@ -266,10 +266,9 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
         }
       });
   }  // Keep existing individual methods as fallback
-  loadWeatherDataFallback() {
-    console.log('Starting fallback weather data load...');
+  loadWeatherDataFallback() {    console.log('Starting fallback weather data load...');
     
-    const apiUrl = `http://localhost:8000/api/weather/current/${this.currentLocation}`;
+    const apiUrl = `${environment.apiUrl}/current/${this.currentLocation}`;
     console.log('Making fallback HTTP request to:', apiUrl);
     this.http.get<WeatherData>(apiUrl)
       .subscribe({
@@ -288,7 +287,7 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
   }
     loadHourlyForecastFallback() {
     console.log('Loading fallback hourly forecast...');
-    const apiUrl = `http://localhost:8000/api/weather/hourly/${this.currentLocation}?hours=24`;
+    const apiUrl = `${environment.apiUrl}/hourly/${this.currentLocation}?hours=24`;
     this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
@@ -305,7 +304,7 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
   }
     loadWeeklyForecastFallback() {
     console.log('Loading fallback 7-day forecast...');
-    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7`;
+    const apiUrl = `${environment.apiUrl}/forecast/${this.currentLocation}?days=7`;
     this.http.get<any>(apiUrl)
       .subscribe({
         next: (data) => {
