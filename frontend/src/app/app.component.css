@@ -12,6 +12,10 @@
   width: 100vw; 
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+  
+  /* Scale the entire app to 80% and center it */
+  transform: scale(0.8);
+  transform-origin: center top;
 }
 
 /* Router outlet styling */

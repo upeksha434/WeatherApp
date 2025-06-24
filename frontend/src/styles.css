@@ -12,6 +12,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
   min-height: 100vh;
+  
+  /* Center the scaled content */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 2vh; /* Small top padding for better positioning */
 }
 
 /* Theme Variables */
