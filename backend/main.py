@@ -19,23 +19,21 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://weather-app-neon-theta-84.vercel.app",
-        "https://*.vercel.app",
-        "*"  # Temporarily allow all origins for debugging
-    ],
-    allow_credentials=False,  # Changed to False when allowing all origins
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=[
-        "Accept",
-        "Accept-Language",
-        "Content-Language",
-        "Content-Type",
-        "Authorization",
-        "X-Requested-With",
-    ],
-    expose_headers=["*"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+# Manual CORS headers for all responses
+@app.middleware("http")
+async def add_cors_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "false"
+    return response
 
 # Include weather routes
 app.include_router(router, prefix="/api/weather", tags=["weather"])
@@ -80,6 +78,12 @@ async def general_exception_handler(request, exc):
         status_code=500,
         content={"error": "Internal Server Error", "detail": "Something went wrong"}
     )
+
+
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    """Handle OPTIONS requests for CORS preflight"""
+    return {"message": "OK"}
 
 
 if __name__ == "__main__":
