@@ -14,14 +14,6 @@ body {
   min-height: 100vh;
 }
 
-/* Container wrapper for responsive design */
-.app-container {
-  max-width: 1400px; /* Limit maximum width */
-  margin: 0 auto; /* Center the content */
-  width: 100%;
-  min-height: 100vh;
-}
-
 /* Theme Variables */
 :root {
   /* Dark Theme (Default) */
