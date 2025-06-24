@@ -1,17 +1,39 @@
 .weather-dashboard {
   display: grid;
-  grid-template-columns: 100px 1fr 500px; /* reduced sidebar width */
+  grid-template-columns: 100px 1fr 400px; /* Adjusted for better proportions */
   grid-template-rows: auto;
   height: 100vh;
+  max-width: 1400px; /* Limit maximum width */
+  margin: 0 auto; /* Center the content */
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Segoe UI', sans-serif;
   gap: 0;
-  margin: 0;
   padding: 0;
-  width: 100vw; 
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Responsive design for different screen sizes */
+@media (max-width: 1200px) {
+  .weather-dashboard {
+    grid-template-columns: 80px 1fr 350px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .weather-dashboard {
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .weather-dashboard {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+  }
 }
 
 /* Router outlet styling */

@@ -1107,28 +1107,46 @@
   }
 }
 
-.location-details {
-  margin-top: 0.5rem;
+/* Responsive design improvements for larger screens */
+@media (min-width: 1400px) {
+  .main-content {
+    max-width: 900px; /* Limit content width on very large screens */
+    margin: 0 auto; /* Center the content */
+    padding: 20px 40px 30px 40px;
+  }
+  
+  .hourly-grid {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .search-bar {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 }
 
-.timezone-info {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .main-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 30px;
+  }
+  
+  .hourly-grid {
+    max-width: 700px;
+    margin: 0 auto;
+  }
 }
 
-.timezone {
-  background: var(--bg-tertiary);
-  padding: 0.25rem 0.2rem;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 0.8rem;
-}
-
-.local-time {
-  font-weight: 500;
-  color: var(--accent-primary);
+/* Improve spacing for medium-large screens */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .main-content {
+    padding: 20px 25px;
+  }
+  
+  .hourly-grid {
+    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+  }
 }
