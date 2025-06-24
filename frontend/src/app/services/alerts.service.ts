@@ -25,10 +25,10 @@ export interface AlertsResponse {
   providedIn: 'root'
 })
 export class AlertsService {
-  private baseUrl = environment.apiUrl.replace('/weather', '');
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) {}getAlerts(location: string): Observable<AlertsResponse> {
-    return this.http.get<any>(`${this.baseUrl}/weather/alerts/${encodeURIComponent(location)}`)
+  getAlerts(location: string): Observable<AlertsResponse> {
+    return this.http.get<any>(`${environment.apiUrl}/alerts/${encodeURIComponent(location)}`)
       .pipe(
         // Transform the response to convert timestamp strings to Date objects
         map(response => ({
