@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface CityLocation {
   id: number;
@@ -17,7 +18,7 @@ export interface CityLocation {
   providedIn: 'root'
 })
 export class SearchService {
-  private baseUrl = 'http://localhost:8000/api/weather';
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

@@ -6,6 +6,7 @@ import { SettingsService } from '../services/settings.service';
 import { LocationService } from '../services/location.service';
 import { SearchService, CityLocation } from '../services/search.service';
 import { Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface WeatherData {
   location?: {
@@ -218,9 +219,8 @@ export class WeatherPageComponent implements OnInit {  weatherData: WeatherData 
   loadAllWeatherData() {
     console.log('Starting to load all weather data for:', this.currentLocation);
     this.loading = true;
-    this.error = null;
-      // Use forecast endpoint which includes current weather, hourly, and daily data
-    const apiUrl = `http://localhost:8000/api/weather/forecast/${this.currentLocation}?days=7&alerts=true`;
+    this.error = null;    // Use forecast endpoint which includes current weather, hourly, and daily data
+    const apiUrl = `${environment.apiUrl}/forecast/${this.currentLocation}?days=7&alerts=true`;
     console.log('Making optimized API request to:', apiUrl);
     
     this.http.get<any>(apiUrl)

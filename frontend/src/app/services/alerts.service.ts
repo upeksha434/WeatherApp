@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface WeatherAlert {
   id: string;
@@ -24,9 +25,9 @@ export interface AlertsResponse {
   providedIn: 'root'
 })
 export class AlertsService {
-  private baseUrl = 'http://localhost:8000/api';
+  private baseUrl = environment.apiUrl.replace('/weather', '');
 
-  constructor(private http: HttpClient) {}  getAlerts(location: string): Observable<AlertsResponse> {
+  constructor(private http: HttpClient) {}getAlerts(location: string): Observable<AlertsResponse> {
     return this.http.get<any>(`${this.baseUrl}/weather/alerts/${encodeURIComponent(location)}`)
       .pipe(
         // Transform the response to convert timestamp strings to Date objects
