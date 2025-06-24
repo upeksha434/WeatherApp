@@ -1,7 +1,7 @@
 .alerts-container {
   padding: 1.5rem;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: 0 1.5rem;
   background: var(--bg-primary);
   min-height: calc(100vh - 80px);
 }

@@ -99,7 +99,8 @@
 
 /* Center panel (main content) */
 .main-content {
-  padding: 20px 30px 30px 30px; /* Adjusted padding for better spacing */
+  
+  padding: 16px 24px 16px 16px;
   padding-bottom: 20px;
   display: grid;
   grid-template-rows: auto auto auto;
@@ -292,13 +293,14 @@
   /* gap: 20px; */
   flex-direction: column;
   
-  margin: 20px;
-  margin-left: 0;
+  margin: 16px 16px 16px 0px;
+  /* margin-left: 0; */
 }
 .forecast-panel {
   background-color: var(--bg-secondary);
   padding: 20px;
   border-radius: 16px;
+  margin: 16px 16px 16px 0px;
 }
 .forecast-panel-sub {
   background-color: var(--bg-secondary);
@@ -556,7 +558,7 @@
   margin-bottom: 16px;
   font-weight: 600;
   letter-spacing: 1px;
-  padding-bottom: 20px;
+  /* padding-bottom: 20px; */
 }
 
 .condition-grid {
@@ -1131,4 +1133,149 @@
 .local-time {
   font-weight: 500;
   color: var(--accent-primary);
+}
+/* Weather page component styles */
+:host {
+  display: contents;
+}
+
+/* Hourly forecast */
+.hourly-forecast {
+  background-color: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.hourly-forecast h3 {
+  font-size: 16px;
+}
+
+.search-header{
+    height: 260px;
+}
+
+.hourly-grid {
+  gap: 10px;
+}
+
+.hourly-item {
+  padding: 10px 6px;
+  border-radius: 6px;
+}
+
+.hour-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.hour-time, .hour-temp {
+  font-size: 14px;
+}
+
+.hour-rain {
+  font-size: 12px;
+}
+
+.main-content {
+  padding: 16px 24px 16px 16px;
+  gap: 16px;
+}
+
+.current-weather {
+  padding: 16px 24px;
+  gap: 16px;
+}
+
+.weather-info h2 {
+  font-size: 18px;
+}
+
+.weather-info p {
+  font-size: 16px;
+}
+
+.weather-info .temperature {
+  font-size: 36px;
+  margin-top: 30px;
+}
+
+.weather-icon img {
+  width: 140px;
+  height: 140px;
+  margin-top: 20px;
+  margin-right: 30px;
+}
+
+.forecast-panel {
+  padding: 16px;
+  border-radius: 14px;
+  margin: 16px 16px 16px 0;
+}
+
+.day-name, .temps {
+  font-size: 14px;
+}
+
+.forecast-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.condition {
+  font-size: 15px;
+}
+
+.label {
+  font-size: 16px;
+}
+
+.value {
+  font-size: 20px;
+}
+
+.condition-grid {
+  gap: 16px 12px;
+}
+
+.settings-header h1 {
+  font-size: 24px;
+}
+
+.settings-header p, .settings-section h2 {
+  font-size: 14px;
+}
+
+.text-input {
+  font-size: 13px;
+  width: 180px;
+}
+
+.popup-temp {
+  font-size: 2.5rem;
+}
+
+.popup-condition {
+  font-size: 1rem;
+}
+
+.popup-header h3 {
+  font-size: 1.2rem;
+}
+
+.nav-arrow {
+  width: 36px;
+  height: 36px;
+}
+
+.nav-tile {
+  min-width: 70px;
+}
+
+.nav-tile-time, .nav-tile-temp {
+  font-size: 12px;
+}
+
+.nav-tile-icon {
+  width: 35px;
+  height: 35px;
 }
