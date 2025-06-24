@@ -7,5 +7,6 @@ export const routes: Routes = [
   { path: 'weather', component: WeatherPageComponent },
   { path: 'settings', component: SettingPageComponent },
   { path: 'alerts', component: AlertsPageComponent },
-  { path: '', redirectTo: '/weather', pathMatch: 'full' }
+  { path: '', redirectTo: '/weather', pathMatch: 'full' },
+  { path: '**', redirectTo: '/weather' }
 ];
