@@ -1,6 +1,7 @@
 # 🌤️ Weather App
 
 > A beautiful, modern weather application built with Angular and FastAPI that brings you accurate weather forecasts with style.
+> Check it out at - https://weather-app-eight-taupe-29.vercel.app/weather
 
 ![Weather App Preview](frontend/src/assets/weather-page.png)
 
